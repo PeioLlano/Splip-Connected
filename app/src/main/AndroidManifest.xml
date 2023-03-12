@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/logo_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PrimerProyecto"
+        tools:targetApi="31">
+        <activity
+            android:name=".Login"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ListGrupos"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".MainGrupo"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".AddGasto"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".AddPago"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".ListGastos"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".ListPagos"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".PagosAjuste"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".SignUp"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".InfoPersona"
+            android:exported="true">
+        </activity>
+    </application>
+
+</manifest>
