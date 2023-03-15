@@ -38,13 +38,12 @@
         android:id="@+id/constraintLayout"
         android:layout_width="349dp"
         android:layout_height="276dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="180dp"
         android:background="@drawable/bordes_layout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.534"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView">
+        app:layout_constraintTop_toTopOf="parent">
 
         <EditText
             android:id="@+id/eNombre"
@@ -131,11 +130,10 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/logo_launcher" />
+        app:srcCompat="@mipmap/logo_launcher"
+        tools:visibility="invisible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

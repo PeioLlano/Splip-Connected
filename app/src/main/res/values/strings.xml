@@ -20,8 +20,8 @@
     <string name="to">To</string>
     <string name="of">Of</string>
     <string name="settle_accounts">Settle accounts</string>
-    <string name="titulo_noti_ajuste">Account settling</string>
-    <string name="cuerpo_noti_ajuste">You have %d payment(s) left to settle the accounts. Do you want to deploy them?</string>
+    <string name="titulo_noti_ajuste">"The account settling has been done successfully. "</string>
+    <string name="cuerpo_noti_ajuste">Account setting done.</string>
     <string name="desplegar_ajustes">Deploy</string>
     <string name="cancel">Cancel</string>
     <string name="empty">Empty list</string>
@@ -55,4 +55,19 @@
     <string name="balance">Balance</string>
     <string name="payments">Payments</string>
     <string name="expenses">Expenses</string>
+    <string name="Date">Date</string>
+    <string name="normal">Normal</string>
+    <string name="style_changed_to">Style changed to:</string>
+    <string name="English">English</string>
+    <string name="Euskera">Basque</string>
+    <string name="Spanish">Spanish</string>
+    <string name="language_changed_to">Language changed to:</string>
+    <string name="incorrect_cred">Incorrect credentials.</string>
+    <string name="added_expense">Added expense</string>
+    <string name="added_payment">Added payment.</string>
+    <string name="select_lenguage">Select language</string>
+    <string name="select_style">Select style</string>
+    <string name="dark">Dark</string>
+    <string name="delete_expense">Do you want to delete the expense?</string>
+    <string name="delete_payment">Do you want to delete the payment?</string>
 </resources>

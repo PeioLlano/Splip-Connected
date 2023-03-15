@@ -10,10 +10,7 @@
         android:id="@+id/ePassword"
         android:layout_width="346dp"
         android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="21dp"
+        android:layout_marginTop="24dp"
         android:background="@drawable/borde_edit_text"
         android:drawableStart="@drawable/password"
         android:drawablePadding="15dp"
@@ -22,22 +19,16 @@
         android:inputType="textPassword"
         android:paddingStart="10dp"
         android:text="admin"
-        app:layout_constraintBottom_toTopOf="@+id/bSignIn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eUsername"
-        app:layout_constraintVertical_bias="0.129" />
+        app:layout_constraintStart_toStartOf="@+id/eUsername"
+        app:layout_constraintTop_toBottomOf="@+id/eUsername" />
 
 
     <EditText
         android:id="@+id/eUsername"
         android:layout_width="346dp"
         android:layout_height="48dp"
-        android:layout_marginStart="9dp"
-        android:layout_marginTop="9dp"
-        android:layout_marginEnd="9dp"
-        android:layout_marginBottom="9dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="50dp"
         android:background="@drawable/borde_edit_text"
         android:drawableStart="@drawable/persona"
         android:drawablePadding="15dp"
@@ -46,24 +37,17 @@
         android:inputType="textPersonName"
         android:paddingStart="10dp"
         android:text="admin"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.332" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/bSignIn"
         android:layout_width="147dp"
         android:layout_height="48dp"
         android:text="@string/boton_login"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.565" />
+        app:layout_constraintStart_toEndOf="@+id/eUsername"
+        app:layout_constraintTop_toTopOf="@+id/eUsername" />
 
     <Button
         android:id="@+id/bSignUp"
@@ -73,8 +57,8 @@
         android:backgroundTint="@color/gris_roto"
         android:text="@string/sign_up"
         android:textColor="#455A64"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/bSignIn"
+        app:layout_constraintStart_toStartOf="@+id/bSignIn"
         app:layout_constraintTop_toBottomOf="@+id/bSignIn" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -101,13 +85,13 @@
         android:id="@+id/bLanguage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
         android:clickable="false"
         android:tint='@color/white'
         android:visibility="invisible"
         app:backgroundTint="@android:color/holo_orange_dark"
-        app:layout_constraintBottom_toTopOf="@+id/bStyle"
-        app:layout_constraintStart_toStartOf="@+id/bStyle"
+        app:layout_constraintStart_toEndOf="@+id/tChangeStyle"
+        app:layout_constraintTop_toTopOf="@+id/bStyle"
         app:srcCompat="@drawable/language"
         tools:ignore="SpeakableTextPresentCheck" />
 
@@ -115,13 +99,13 @@
         android:id="@+id/bStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
         android:clickable="false"
         android:tint='@color/white'
         android:visibility="invisible"
         app:backgroundTint="@android:color/holo_orange_dark"
-        app:layout_constraintBottom_toTopOf="@+id/bMail"
-        app:layout_constraintStart_toStartOf="@+id/bMail"
+        app:layout_constraintStart_toEndOf="@+id/bMail"
+        app:layout_constraintTop_toTopOf="@+id/bMail"
         app:srcCompat="@drawable/style"
         tools:ignore="SpeakableTextPresentCheck" />
 
@@ -182,6 +166,6 @@
         android:text="@string/no_account"
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@+id/bSignUp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/bSignUp"
+        app:layout_constraintStart_toStartOf="@+id/bSignUp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

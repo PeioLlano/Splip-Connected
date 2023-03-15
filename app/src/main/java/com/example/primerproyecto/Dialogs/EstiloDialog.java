@@ -9,6 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.primerproyecto.R;
+
 public class EstiloDialog extends DialogFragment {
 
     ListenerdelDialogoEstilo miListener;
@@ -24,8 +26,8 @@ public class EstiloDialog extends DialogFragment {
         miListener =(ListenerdelDialogoEstilo) getActivity();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        CharSequence[] opciones = {"Dark", "Normal"};
-        builder.setTitle("Seleccione el estilo")
+        CharSequence[] opciones = {getString(R.string.dark), getString(R.string.normal)};
+        builder.setTitle(getString(R.string.select_style))
                 .setItems(opciones, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

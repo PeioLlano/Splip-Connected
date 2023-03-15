@@ -2,80 +2,100 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraint"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Actividades.Login">
+    android:backgroundTint="@color/purple_700"
+    tools:context=".Actividades.ListGrupos">
 
-    <EditText
-        android:id="@+id/ePassword"
-        android:layout_width="346dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="21dp"
-        android:background="@drawable/borde_edit_text"
-        android:drawableStart="@drawable/password"
-        android:drawablePadding="15dp"
-        android:ems="10"
-        android:hint="@string/password_placeholder"
-        android:inputType="textPassword"
-        android:paddingStart="10dp"
-        android:text="admin"
-        app:layout_constraintBottom_toTopOf="@+id/bSignIn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eUsername"
-        app:layout_constraintVertical_bias="0.129" />
-
-
-    <EditText
-        android:id="@+id/eUsername"
-        android:layout_width="346dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="9dp"
-        android:layout_marginTop="9dp"
-        android:layout_marginEnd="9dp"
-        android:layout_marginBottom="9dp"
-        android:background="@drawable/borde_edit_text"
-        android:drawableStart="@drawable/persona"
-        android:drawablePadding="15dp"
-        android:ems="10"
-        android:hint="@string/username_placeholder"
-        android:inputType="textPersonName"
-        android:paddingStart="10dp"
-        android:text="admin"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.332" />
-
-    <Button
-        android:id="@+id/bSignIn"
-        android:layout_width="147dp"
-        android:layout_height="48dp"
-        android:text="@string/boton_login"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.565" />
-
-    <Button
-        android:id="@+id/bSignUp"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/bLogOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:backgroundTint="@color/gris_roto"
-        android:text="@string/sign_up"
-        android:textColor="#455A64"
+        android:layout_marginBottom="16dp"
+        android:clickable="false"
+        android:tint='@color/white'
+        android:visibility="invisible"
+        app:backgroundTint="@android:color/holo_orange_dark"
+        app:layout_constraintBottom_toTopOf="@+id/bLanguage"
+        app:layout_constraintStart_toStartOf="@+id/bLanguage"
+        app:srcCompat="@drawable/logout"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <TextView
+        android:id="@+id/tLogOut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:text="@string/logout"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/bLogOut"
+        app:layout_constraintTop_toTopOf="@+id/bLogOut" />
+
+    <TextView
+        android:id="@+id/tLogOutAcount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="@string/volver_login"
+        android:textSize="10sp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="@+id/tLogOut"
+        app:layout_constraintTop_toBottomOf="@+id/tLogOut" />
+
+    <ListView
+        android:id="@+id/lPersonas"
+        android:layout_width="538dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bSignIn" />
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        tools:listitem="@layout/grupo_item" />
+
+    <LinearLayout
+        android:id="@+id/lVacia"
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/empty_image"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/person_off" />
+
+        <TextView
+            android:id="@+id/emptyMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:alpha="0.3"
+            android:text="@string/empty"
+            android:textColor="?attr/colorSecondaryVariant"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/select_group"
+        android:textSize="17sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/bMail"
@@ -163,6 +183,18 @@
         app:layout_constraintTop_toTopOf="@+id/bStyle" />
 
     <TextView
+        android:id="@+id/tPlusGrupo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="10dp"
+        android:text="@string/plus_grupo"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/bPlusGrupo"
+        app:layout_constraintTop_toTopOf="@+id/bPlusGrupo" />
+
+    <TextView
         android:id="@+id/tPosibleStyles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -175,13 +207,42 @@
         app:layout_constraintTop_toBottomOf="@+id/tChangeStyle" />
 
     <TextView
-        android:id="@+id/tNoCuenta"
+        android:id="@+id/tGrupoDeGastos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp"
-        android:text="@string/no_account"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/bSignUp"
+        android:layout_marginTop="5dp"
+        android:text="@string/explicacion_add_grupo"
+        android:textSize="10sp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/tPlusGrupo"
+        app:layout_constraintTop_toBottomOf="@+id/tPlusGrupo" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/bOtions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:clickable="true"
+        android:foregroundTint="@color/white"
+        android:tint="@color/white"
+        android:visibility="visible"
+        app:backgroundTint="@android:color/holo_orange_dark"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:srcCompat="@drawable/left"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/bPlusGrupo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:clickable="false"
+        android:visibility="invisible"
+        app:backgroundTint="@android:color/holo_orange_dark"
+        app:layout_constraintBottom_toTopOf="@+id/bOtions"
+        app:layout_constraintEnd_toEndOf="@+id/bOtions"
+        app:srcCompat="@drawable/grupo"
+        tools:ignore="SpeakableTextPresentCheck" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package com.example.primerproyecto;
+package com.example.primerproyecto.Actividades;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +16,7 @@ import com.example.primerproyecto.Clases.Pago;
 import com.example.primerproyecto.Dialogs.IdiomaDialog;
 import com.example.primerproyecto.ListAdapters.PagoAdapter;
 import com.example.primerproyecto.ListAdapters.PagosAjusteAdapter;
+import com.example.primerproyecto.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.BufferedReader;
@@ -41,15 +42,18 @@ public class PagosAjuste extends AppCompatActivity implements PagosAjusteAdapter
 
         String divisa = "";
 
+        //Obtenemos el grupo necesario para generar la lista y pediremos los pagos para ajuste
         Bundle extras = getIntent().getExtras();
         Grupo grupo = (Grupo) getIntent().getSerializableExtra("grupo");
         divisa = grupo.getDivisa();
         pagosAjuste =  grupo.ajustarCuentas();
 
+        //Inicializamos la lista con la lista de pagos
         ListView lPagos = (ListView) findViewById(R.id.lPagos);
         pAdapter = new PagosAjusteAdapter(getApplicationContext(), pagosAjuste, divisa);
         lPagos.setAdapter(pAdapter);
 
+        //Boton para notificar via mail de los apgos restantes para ajustar cuentas
         FloatingActionButton bMail = (FloatingActionButton) findViewById(R.id.bMail);
         bMail.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,20 +92,11 @@ public class PagosAjuste extends AppCompatActivity implements PagosAjusteAdapter
             }
         });
 
+        //Boton para guardar en la lista de pagos los pagos seleccionados
         FloatingActionButton bSave = (FloatingActionButton) findViewById(R.id.bSave);
         bSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*try {
-                    OutputStreamWriter fichero = new OutputStreamWriter(openFileOutput("formato_mail_aviso.txt",
-                            Context.MODE_PRIVATE));
-                    fichero.write("Ajuste de cuentas para %s \n" +
-                                    "Los pagos que le quedan por hacer para ajustar las cuentas, son los siguientes: \n" +
-                                    "\t - Pago de %s a %s con un importe de %f. \n" +
-                                    "~ Gracias por confiar en Splip ~");
-                    fichero.close();
-                } catch (IOException e){}*/
-
                 Intent intent = new Intent();
                 intent.putExtra("pagosSeleccionados", pagosSeleccionados);
                 setResult(RESULT_OK, intent);
@@ -109,14 +104,15 @@ public class PagosAjuste extends AppCompatActivity implements PagosAjusteAdapter
             }
         });
 
+        //Si la lista es vacia mostraremos el layout de lista vacia.
         LinearLayout lVacia = findViewById(R.id.lVacia);
-
         if (pagosAjuste.size() == 0){
             lVacia.setVisibility(View.VISIBLE);
             lPagos.setVisibility(View.GONE);
         }
     }
 
+    //Si el pago esta seleccionado borrar de la lista y si no lo esta lo añadimos
     @Override
     public void checkPago(Pago p) {
         if (pagosSeleccionados.contains(p)) {

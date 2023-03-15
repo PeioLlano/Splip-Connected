@@ -14,7 +14,7 @@
         android:theme="@style/Theme.PrimerProyecto"
         tools:targetApi="31">
         <activity
-            android:name=".Login"
+            android:name=".Actividades.Login"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,39 +23,48 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ListGrupos"
+            android:name=".Actividades.ListGrupos"
             android:exported="true">
         </activity>
         <activity
-            android:name=".MainGrupo"
+            android:name=".Actividades.MainGrupo"
             android:exported="true">
         </activity>
         <activity
-            android:name=".AddGasto"
+            android:name=".Actividades.AddGasto"
             android:exported="true">
         </activity>
         <activity
-            android:name=".AddPago"
+            android:name=".Actividades.AddPago"
             android:exported="true">
         </activity>
         <activity
-            android:name=".ListGastos"
+            android:name=".Actividades.ListGastos"
             android:exported="true">
         </activity>
         <activity
-            android:name=".ListPagos"
+            android:name=".Actividades.ListPagos"
             android:exported="true">
         </activity>
         <activity
-            android:name=".PagosAjuste"
+            android:name=".Actividades.PagosAjuste"
             android:exported="true">
         </activity>
         <activity
-            android:name=".SignUp"
+            android:name=".Actividades.SignUp"
             android:exported="true">
         </activity>
         <activity
-            android:name=".InfoPersona"
+            android:name=".Actividades.InfoPersona"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".Actividades.ListGastosCF"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".Actividades.InfoGasto"
             android:exported="true">
         </activity>
     </application>

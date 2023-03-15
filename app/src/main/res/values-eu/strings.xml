@@ -22,7 +22,7 @@
     <string name="of">Norena?</string>
     <string name="settle_accounts">Kontuak egin</string>
     <string name="titulo_noti_ajuste">Kontu egitea</string>
-    <string name="cuerpo_noti_ajuste">%d ordainketa geratzen zaiz(ki)u kontuak egiteko. Zabaldu nahi dituzu?</string>
+    <string name="cuerpo_noti_ajuste">Kontua egitea arrakastaz egin da.</string>
     <string name="desplegar_ajustes">Zabaldu</string>
     <string name="cancel">Utzi</string>
     <string name="empty">Lista hutsa</string>
@@ -56,4 +56,19 @@
     <string name="balance">Balantzea</string>
     <string name="payments">Ordainketak</string>
     <string name="expenses">Gastuak</string>
+    <string name="Date">Data</string>
+    <string name="normal">Normal</string>
+    <string name="style_changed_to">"Estiloa hurrengo modura aldatu da: "</string>
+    <string name="English">Ingelesa</string>
+    <string name="Euskera">Euskera</string>
+    <string name="Spanish">Gaztelera</string>
+    <string name="language_changed_to">"Hizkuntza hurrengo modura aldatu da: "</string>
+    <string name="incorrect_cred">Kredentzial okerrak.</string>
+    <string name="added_expense">Gastua gehituta.</string>
+    <string name="added_payment">Ordainketa gehituta.</string>
+    <string name="select_lenguage">Hautatu hizkuntza</string>
+    <string name="select_style">Hautatu estiloa</string>
+    <string name="dark">Iluna</string>
+    <string name="delete_expense">Gastua ezabatu nahi duzu?</string>
+    <string name="delete_payment">Ordainketa ezabatu nahi duzu?</string>
 </resources>

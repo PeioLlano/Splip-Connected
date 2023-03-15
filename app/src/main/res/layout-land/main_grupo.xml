@@ -9,8 +9,8 @@
 
     <TextView
         android:id="@+id/tExpAddPersona"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="70dp"
+        android:layout_height="18dp"
         android:layout_marginTop="5dp"
         android:text="@string/explicacion_add_grupo"
         android:textSize="10sp"
@@ -20,8 +20,8 @@
 
     <TextView
         android:id="@+id/tExpListGastos"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="74dp"
+        android:layout_height="35dp"
         android:layout_marginTop="5dp"
         android:text="@string/exp_list_gstos"
         android:textSize="10sp"
@@ -31,8 +31,8 @@
 
     <TextView
         android:id="@+id/tExpListPagos"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="74dp"
+        android:layout_height="27dp"
         android:layout_marginTop="5dp"
         android:text="@string/exp_list_pagos"
         android:textSize="10sp"
@@ -64,26 +64,31 @@
 
     <ListView
         android:id="@+id/lPersonas"
-        android:layout_width="376dp"
-        android:layout_height="543dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="150dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="150dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/bAjustarCuentas"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tGrupo"
         app:layout_constraintVertical_bias="0.497"
-        tools:listitem="@layout/persona_item"/>
+        tools:listitem="@layout/persona_item" />
 
     <LinearLayout
         android:id="@+id/lVacia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="9dp"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="invisible"
-        android:layout_width="376dp"
-        android:layout_height="543dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tPlusPersona"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/tGrupo">
 
         <ImageView
             android:id="@+id/empty_image"
@@ -172,8 +177,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="5dp"
         android:text="@string/add_payment"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/bAddPago"
@@ -223,7 +229,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="5dp"
         android:text="@string/plus_person"
         android:textStyle="bold"
         android:visibility="invisible"
@@ -234,9 +240,10 @@
         android:id="@+id/tListGastos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:text="@string/list_expenses"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/bVerGastos"
@@ -246,9 +253,10 @@
         android:id="@+id/tListPagos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:text="@string/lista_pagos"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/bVerPagos"
@@ -259,8 +267,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="5dp"
         android:text="@string/add_expense"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/bAddGasto"

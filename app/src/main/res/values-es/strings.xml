@@ -22,7 +22,7 @@
     <string name="of">De</string>
     <string name="settle_accounts">Ajustar Cuentas</string>
     <string name="titulo_noti_ajuste">Ajuste de cuentas</string>
-    <string name="cuerpo_noti_ajuste">Le queda(n) %d pago(s) para ajustar las cuentas. ¿Quiere desplegarlos?</string>
+    <string name="cuerpo_noti_ajuste">Se ha realizado el ajuste de cuentas correctamente.</string>
     <string name="desplegar_ajustes">Desplegar</string>
     <string name="cancel">Cancelar</string>
     <string name="empty">Lista vacia</string>
@@ -56,4 +56,19 @@
     <string name="balance">Balance</string>
     <string name="payments">Pagos</string>
     <string name="expenses">Gastos</string>
+    <string name="Date">Fecha</string>
+    <string name="normal">Normal</string>
+    <string name="style_changed_to">"Estilo cambiado a: "</string>
+    <string name="English">Inglés</string>
+    <string name="Euskera">Euskera</string>
+    <string name="Spanish">Español</string>
+    <string name="language_changed_to">"Idioma cambiado a: "</string>
+    <string name="incorrect_cred">Credenciales incorrectas.</string>
+    <string name="added_expense">Gasto añadido.</string>
+    <string name="added_payment">Pago añadido.</string>
+    <string name="select_lenguage">Seleccione el idioma</string>
+    <string name="select_style">Seleccione the estilo</string>
+    <string name="dark">Oscuro</string>
+    <string name="delete_expense">¿Quiere eliminar el gasto?</string>
+    <string name="delete_payment">¿Quiere eliminar el pago?</string>
 </resources>

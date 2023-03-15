@@ -17,8 +17,10 @@ public class BBDD extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        //Para habilitar las foreign keys
         sqLiteDatabase.execSQL("PRAGMA foreign_keys=ON");
 
+        //Crear las tablas y añadir unos datos de prueba
         sqLiteDatabase.execSQL("CREATE TABLE Usuarios (Usuario VARCHAR(255), Contraseña VARCHAR(255), PRIMARY KEY (Usuario))");
         sqLiteDatabase.execSQL("CREATE TABLE Grupos (Usuario VARCHAR(255) ,Titulo VARCHAR(255), Divisa VARCHAR(255), CONSTRAINT FK_G_1 FOREIGN KEY (Usuario) REFERENCES Usuarios(Usuario) ON DELETE CASCADE, PRIMARY KEY (Usuario, Titulo))");
         sqLiteDatabase.execSQL("CREATE TABLE Personas (Usuario VARCHAR(255), Grupo VARCHAR(255), Nombre VARCHAR(255), CONSTRAINT FK_P_1 FOREIGN KEY (Usuario,Grupo) REFERENCES Grupos(Usuario,Titulo) ON DELETE CASCADE, PRIMARY KEY (Usuario,Grupo, Nombre))");
@@ -35,11 +37,11 @@ public class BBDD extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("INSERT INTO Personas ('Usuario', 'Grupo', 'Nombre') VALUES ('admin','Viaje a Malaga', 'Patxi')");
         sqLiteDatabase.execSQL("INSERT INTO Personas ('Usuario', 'Grupo', 'Nombre') VALUES ('admin','Viaje a Malaga', 'Madalen')");
 
-        sqLiteDatabase.execSQL("INSERT INTO Gastos ('Usuario', 'Grupo', 'Persona','Titulo', 'Cantidad') VALUES ('admin','Viaje a Malaga', 'Madalen', 'Cena pizzeria', '56.8')");
-        sqLiteDatabase.execSQL("INSERT INTO Gastos ('Usuario', 'Grupo', 'Persona','Titulo', 'Cantidad') VALUES ('admin','Viaje a Malaga', 'Ander', 'Gasolina', '80.6')");
+        sqLiteDatabase.execSQL("INSERT INTO Gastos ('Usuario', 'Grupo', 'Persona','Titulo', 'Cantidad', 'Fecha') VALUES ('admin','Viaje a Malaga', 'Madalen', 'Cena pizzeria', '56.8', '10-01-2023')");
+        sqLiteDatabase.execSQL("INSERT INTO Gastos ('Usuario', 'Grupo', 'Persona','Titulo', 'Cantidad', 'Fecha') VALUES ('admin','Viaje a Malaga', 'Ander', 'Gasolina', '80.6', '12-01-2023')");
 
-        sqLiteDatabase.execSQL("INSERT INTO Pagos ('Usuario', 'Grupo', 'PersonaAutora','PersonaDestinataria', 'Cantidad') VALUES ('admin','Viaje a Malaga', 'Peio', 'Ander', '20.15')");
-        sqLiteDatabase.execSQL("INSERT INTO Pagos ('Usuario', 'Grupo', 'PersonaAutora','PersonaDestinataria', 'Cantidad') VALUES ('admin','Viaje a Malaga', 'Patxi', 'Madalen', '10')");
+        sqLiteDatabase.execSQL("INSERT INTO Pagos ('Usuario', 'Grupo', 'PersonaAutora','PersonaDestinataria', 'Cantidad', 'Fecha') VALUES ('admin','Viaje a Malaga', 'Peio', 'Ander', '20.15', '17-01-2023')");
+        sqLiteDatabase.execSQL("INSERT INTO Pagos ('Usuario', 'Grupo', 'PersonaAutora','PersonaDestinataria', 'Cantidad', 'Fecha') VALUES ('admin','Viaje a Malaga', 'Patxi', 'Madalen', '10', '13-01-2023')");
     }
 
     @Override
@@ -49,6 +51,7 @@ public class BBDD extends SQLiteOpenHelper {
 
     @Override
     public void onOpen(SQLiteDatabase db){
+        //Para habilitar las foreign keys
         super.onOpen(db);
         db.execSQL("PRAGMA foreign_keys=ON");
     }

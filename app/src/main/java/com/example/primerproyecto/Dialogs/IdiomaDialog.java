@@ -9,6 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.primerproyecto.R;
+
 public class IdiomaDialog extends DialogFragment {
 
     ListenerdelDialogoIdioma miListener;
@@ -24,8 +26,8 @@ public class IdiomaDialog extends DialogFragment {
         miListener =(ListenerdelDialogoIdioma) getActivity();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        CharSequence[] opciones = {"Inglés", "Español", "Euskera"};
-        builder.setTitle("Seleccione el idioma")
+        CharSequence[] opciones = {getString(R.string.English), getString(R.string.Spanish), getString(R.string.Euskera)};
+        builder.setTitle(getString(R.string.select_lenguage))
                 .setItems(opciones, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

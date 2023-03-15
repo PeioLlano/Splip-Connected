@@ -6,73 +6,36 @@
     android:layout_height="match_parent"
     tools:context=".Actividades.InfoPersona">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/bAtras"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="8dp"
-        android:clickable="true"
-        app:backgroundTint="@android:color/holo_orange_dark"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/flecha_izquierda"
-        tools:ignore="SpeakableTextPresentCheck" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/bGuardar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:clickable="true"
-        app:backgroundTint="@android:color/holo_orange_dark"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/guardar"
-        tools:ignore="SpeakableTextPresentCheck" />
-
 
     <EditText
         android:id="@+id/eNombre"
         android:layout_width="0dp"
         android:layout_height="35dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/borde_edit_text"
         android:drawableStart="@drawable/money"
+        android:editable="false"
         android:ems="10"
-        android:hint="@string/enterName"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:textAlignment="center"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
-        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="48dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/persona" />
+        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
     <LinearLayout
         android:id="@+id/linearVertical"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="24dp"
-        android:layout_marginBottom="32dp"
         android:divider="@drawable/distancia_linear_layout"
         android:orientation="vertical"
         android:showDividers="middle"
-        app:layout_constraintBottom_toTopOf="@+id/bGuardar"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/eNombre"
         app:layout_constraintStart_toStartOf="@+id/eNombre"
         app:layout_constraintTop_toBottomOf="@+id/eNombre">
@@ -91,13 +54,13 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:paddingStart="15dp"
-                android:text="@string/balance"
+                android:text="@string/amount"
                 android:textAlignment="textStart"
                 android:textSize="18sp"
                 tools:ignore="RtlCompat" />
 
             <TextView
-                android:id="@+id/tBalance"
+                android:id="@+id/tCantidad"
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:layout_weight="1"
@@ -123,13 +86,13 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:paddingStart="15dp"
-                android:text="@string/expenses"
+                android:text="@string/of"
                 android:textAlignment="textStart"
                 android:textSize="18sp"
                 tools:ignore="RtlCompat" />
 
             <TextView
-                android:id="@+id/tGastos"
+                android:id="@+id/tAutor"
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:layout_weight="1"
@@ -155,13 +118,13 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:paddingStart="15dp"
-                android:text="@string/payments"
+                android:text="@string/Date"
                 android:textAlignment="textStart"
                 android:textSize="18sp"
                 tools:ignore="RtlCompat" />
 
             <TextView
-                android:id="@+id/tPagosInt"
+                android:id="@+id/tFecha"
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:layout_weight="1"

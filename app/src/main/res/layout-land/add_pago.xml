@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Actividades.AddGasto">
-
+    tools:context=".Actividades.AddPago">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/bAtras"
@@ -33,78 +32,65 @@
         app:srcCompat="@drawable/guardar"
         tools:ignore="SpeakableTextPresentCheck" />
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
-        android:layout_width="349dp"
-        android:layout_height="276dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="180dp"
+        android:layout_width="348dp"
+        android:layout_height="255dp"
         android:background="@drawable/bordes_layout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView">
-
-        <EditText
-            android:id="@+id/eNombre"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/borde_edit_text"
-            android:drawableStart="@drawable/persona"
-            android:drawablePadding="12dp"
-            android:ems="10"
-            android:hint="@string/name_placeholder"
-            android:inputType="textPersonName"
-            android:minHeight="48dp"
-            android:paddingStart="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="MissingConstraints" />
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/tAutor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:text="@string/of"
-            android:textSize="18sp"
+            android:layout_marginTop="48dp"
+            android:text="@string/from"
+            android:textSize="20sp"
             app:layout_constraintStart_toStartOf="@+id/eCantidad"
             app:layout_constraintTop_toBottomOf="@+id/eCantidad" />
+
+        <TextView
+            android:id="@+id/tDestinatario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:text="@string/to"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="@+id/eCantidad"
+            app:layout_constraintTop_toBottomOf="@+id/tAutor" />
 
         <TextView
             android:id="@+id/tDivisa"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="3dp"
             android:text="€"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="@+id/eCantidad"
-            app:layout_constraintEnd_toEndOf="@+id/eNombre"
+            app:layout_constraintStart_toEndOf="@+id/eCantidad"
             app:layout_constraintTop_toTopOf="@+id/eCantidad" />
 
         <EditText
             android:id="@+id/eCantidad"
             android:layout_width="0dp"
             android:layout_height="37dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="48dp"
             android:background="@drawable/borde_edit_text"
             android:drawableStart="@drawable/money"
             android:drawablePadding="10dp"
             android:ems="10"
             android:hint="@string/amount"
             android:inputType="numberDecimal"
-            android:paddingStart="10dp"
-            android:paddingEnd="8dp"
             android:textAlignment="center"
             android:textSize="18sp"
-            app:layout_constraintEnd_toStartOf="@+id/tDivisa"
-            app:layout_constraintStart_toStartOf="@+id/eNombre"
-            app:layout_constraintTop_toBottomOf="@+id/eNombre"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
         <Spinner
@@ -113,16 +99,29 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="24dp"
-            android:dropDownWidth="wrap_content"
-            android:dropDownSelector="@drawable/dropdown"
+            android:layout_marginEnd="32dp"
             android:gravity="end"
+            android:minHeight="48dp"
             android:textAlignment="gravity"
             app:layout_constraintBottom_toBottomOf="@+id/tAutor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tAutor"
             app:layout_constraintTop_toTopOf="@+id/tAutor"
-            app:layout_constraintVertical_bias="0.0"
+            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+        <Spinner
+            android:id="@+id/sDestinatario"
+            style="@null"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:gravity="end"
+            android:minHeight="48dp"
+            android:textAlignment="gravity"
+            app:layout_constraintBottom_toBottomOf="@+id/tDestinatario"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/sAutor"
+            app:layout_constraintTop_toTopOf="@+id/tDestinatario"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -131,11 +130,11 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="6dp"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/logo_launcher" />
+        app:srcCompat="@mipmap/logo_launcher"
+        tools:visibility="invisible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

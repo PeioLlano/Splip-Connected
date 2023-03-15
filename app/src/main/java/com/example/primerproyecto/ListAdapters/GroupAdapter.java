@@ -1,6 +1,7 @@
 package com.example.primerproyecto.ListAdapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +56,7 @@ public class GroupAdapter extends BaseAdapter {
         tTitulo.setText(getTitulo(grupo));
         String participantes = getIntegrantes(grupo);
         if (participantes == "NoTengo") {
-            participantes = view.getResources().getString(R.string.no_integrantes);
+            participantes = viewGroup.getResources().getString(R.string.no_integrantes);
         }
         tParticipantes.setText(participantes);
         iGrupo.setImageResource(R.drawable.grupo);

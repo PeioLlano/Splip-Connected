@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,7 +45,14 @@ public class AddPersonDialog extends AppCompatDialogFragment {
                 .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        miListener.añadirPersona(eName.getText().toString());
+                        if (!eName.getText().toString().equals("")) {
+                            miListener.añadirPersona(eName.getText().toString());
+                        }
+                            else{
+                            int tiempoToast= Toast.LENGTH_SHORT;
+                            Toast avisoGasto = Toast.makeText(view.getContext(), getString(R.string.fill_fields), tiempoToast);
+                            avisoGasto.show();
+                        }
                     }
                 });
 

@@ -1,4 +1,4 @@
-package com.example.primerproyecto;
+package com.example.primerproyecto.Actividades;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
@@ -31,9 +30,9 @@ import com.example.primerproyecto.Clases.Gasto;
 import com.example.primerproyecto.Clases.Grupo;
 import com.example.primerproyecto.Clases.Pago;
 import com.example.primerproyecto.Clases.Persona;
+import com.example.primerproyecto.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -52,15 +51,20 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_grupos);
 
+        //Obtenemos el usuario necesario para obtener los demas datos
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             username = extras.getString("usuario");
         }
 
+        //Abrimos la conexion con la base de datos
         BBDD gestorBBDD = new BBDD(this, "SpliP", null, 1);
         bbdd = gestorBBDD.getWritableDatabase();
+
+        //Pedimos todos los Grupos que tenga el usuario que hemos recibido
         Cursor c = bbdd.rawQuery("SELECT * FROM Grupos WHERE Usuario = ?", new String[]{username});
 
+        //Por cada grupo buscaremos todas las personas y añadiremos ambos objetos a sus repectivas listas
         if (c.moveToFirst()){
             do{
                 String Titulo = c.getString(1);
@@ -82,12 +86,15 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
             }while(c.moveToNext());
         }
 
+
+        //Inicializamos la lisat de grupos
         lGrupos = (ListView) findViewById(R.id.lPersonas);
         lVacia = findViewById(R.id.lVacia);
 
         pAdapter = new GroupAdapter(getApplicationContext(), arraydedatos);
 
         lGrupos.setAdapter(pAdapter);
+        //Si clicamos un grupo nos lleve a MainGrupo
         lGrupos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -99,10 +106,12 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
             }
         });
 
+        ///Gestionar que se ve dependiendo si la lista esta vacia o llena
         actualizarVacioLleno(arraydedatos);
 
         final Integer[] posAborrar = {-1};
 
+        //Generar el dialogo que se deberia de ver si pulsamos por un tiempo prolongado un grupo
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);
         builder.setTitle(getString(R.string.delete_group));
@@ -110,6 +119,7 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //Borramos el grupo de todos los lados y se lo notificamos al adaptador
                         bbdd.delete("Grupos", "Titulo = ? AND Usuario = ?", new String[]{arraydedatos.get(posAborrar[0]).getTitulo(), username});
                         arraydedatos.remove(((int)posAborrar[0]));
                         pAdapter.notifyDataSetChanged();
@@ -127,6 +137,7 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
 
 
 
+        //Si pulsamos por un tiempo prolongado un grupo mostramos el dialogo
         lGrupos.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
@@ -137,7 +148,8 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
             }
         });
 
-        FloatingActionButton bLanguage = (FloatingActionButton) findViewById(R.id.bLanguage);
+        FloatingActionButton bLanguage = findViewById(R.id.bLanguage);
+        //Boton para gestionar el idioma, se muestra el dialogo que es para ello.
         bLanguage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -146,7 +158,8 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
             }
         });
 
-        FloatingActionButton bStyle = (FloatingActionButton) findViewById(R.id.bStyle);
+        FloatingActionButton bStyle =  findViewById(R.id.bStyle);
+        //Boton para gestionar el estilo, se muestra el dialogo que es para ello.
         bStyle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -155,10 +168,12 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
             }
         });
 
-        FloatingActionButton bLogOut = (FloatingActionButton) findViewById(R.id.bLogOut);
+        //Boton para cerrar sesion
+        FloatingActionButton bLogOut = findViewById(R.id.bLogOut);
         bLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Quitamos la preferencia del usuario loggeado y abrimo la actividad de login
                 SharedPreferences preferences = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("loged_user", "");
@@ -170,18 +185,38 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
             }
         });
 
-        TextView tPosibleLanguages = (TextView) findViewById(R.id.tPosibleLanguages);
-        TextView tChangeLanguages = (TextView) findViewById(R.id.tChangeLanguages);
+        TextView tPosibleLanguages = findViewById(R.id.tPosibleLanguages);
+        TextView tChangeLanguages = findViewById(R.id.tChangeLanguages);
 
-        TextView tPosibleStyles = (TextView) findViewById(R.id.tPosibleStyles);
-        TextView tChangeStyle = (TextView) findViewById(R.id.tChangeStyle);
+        TextView tPosibleStyles = findViewById(R.id.tPosibleStyles);
+        TextView tChangeStyle = findViewById(R.id.tChangeStyle);
 
-        TextView tLogOut = (TextView) findViewById(R.id.tLogOut);
-        TextView tLogOutAcount = (TextView) findViewById(R.id.tLogOutAcount);
+        TextView tLogOut = findViewById(R.id.tLogOut);
+        TextView tLogOutAcount = findViewById(R.id.tLogOutAcount);
 
         final Boolean[] clicadoAjustes = {false};
 
-        FloatingActionButton bSettings = (FloatingActionButton) findViewById(R.id.bMail);
+        TextView tPlusGrupo = findViewById(R.id.tPlusGrupo);
+        TextView tGrupoDeGastos = findViewById(R.id.tGrupoDeGastos);
+
+        FloatingActionButton bPlusGrupo = findViewById(R.id.bPlusGrupo);
+
+        //Gesrionamos mediante un dialogo añadir un grupo al pulsar el boton
+        bPlusGrupo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AddGroupDialog addGroupDialog = new AddGroupDialog();
+                addGroupDialog.show(getSupportFragmentManager(), "add group dialog");
+            }
+        });
+
+        final Boolean[] clicadoOpciones = {false};
+
+        FloatingActionButton bOtions = findViewById(R.id.bOtions);
+
+        FloatingActionButton bSettings = findViewById(R.id.bMail);
+
+        //Si pulsamos el boton de ajustes deplegamos o recogemos botones dependiendo del caso
         bSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -203,6 +238,16 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
 
                     tLogOut.setVisibility(View.VISIBLE);
                     tLogOutAcount.setVisibility(View.VISIBLE);
+
+                    bOtions.setImageResource(R.drawable.left);
+
+                    bPlusGrupo.setVisibility(View.INVISIBLE);
+                    bPlusGrupo.setClickable(false);
+
+                    tPlusGrupo.setVisibility(View.INVISIBLE);
+                    tGrupoDeGastos.setVisibility(View.INVISIBLE);
+
+                    clicadoOpciones[0] = false;
                 }
                 else {
                     bLanguage.setVisibility(View.INVISIBLE);
@@ -227,21 +272,7 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
             }
         });
 
-        TextView tPlusGrupo = (TextView) findViewById(R.id.tPlusGrupo);
-        TextView tGrupoDeGastos = (TextView) findViewById(R.id.tGrupoDeGastos);
-
-        FloatingActionButton bPlusGrupo = (FloatingActionButton) findViewById(R.id.bPlusGrupo);
-        bPlusGrupo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AddGroupDialog addGroupDialog = new AddGroupDialog();
-                addGroupDialog.show(getSupportFragmentManager(), "add group dialog");
-            }
-        });
-
-        final Boolean[] clicadoOpciones = {false};
-
-        FloatingActionButton bOtions = (FloatingActionButton) findViewById(R.id.bOtions);
+        //Si pulsamos el boton de opciones deplegamos o recogemos botones dependiendo del caso
         bOtions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -253,6 +284,26 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
 
                     tPlusGrupo.setVisibility(View.VISIBLE);
                     tGrupoDeGastos.setVisibility(View.VISIBLE);
+
+                    bLanguage.setVisibility(View.INVISIBLE);
+                    bLanguage.setClickable(false);
+
+                    bStyle.setVisibility(View.INVISIBLE);
+                    bStyle.setClickable(false);
+
+                    bLogOut.setVisibility(View.INVISIBLE);
+                    bLogOut.setClickable(true);
+
+                    tChangeLanguages.setVisibility(View.INVISIBLE);
+                    tPosibleLanguages.setVisibility(View.INVISIBLE);
+
+                    tChangeStyle.setVisibility(View.INVISIBLE);
+                    tPosibleStyles.setVisibility(View.INVISIBLE);
+
+                    tLogOut.setVisibility(View.INVISIBLE);
+                    tLogOutAcount.setVisibility(View.INVISIBLE);
+
+                    clicadoAjustes[0] = false;
                 }
                 else {
                     bOtions.setImageResource(R.drawable.left);
@@ -268,6 +319,7 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
         });
     }
 
+    //Al tratar de cerrar la app preguntamos si esta seguro mediante dialogo
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this)
@@ -281,9 +333,11 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
                 }).create().show();
     }
 
+    //Implementamos el metodo del dailogo de añadir grupo.
     @Override
     public void añadirGrupo(String Name, String currency) {
 
+        //Hacemos try de insertar el grupo para mostrar un toast en caso de que no se pueda insertar
         try{
             ContentValues contentValues = new ContentValues();
             contentValues.put("Usuario", username);
@@ -306,11 +360,12 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
 
     }
 
+    //Implementamos el metodo del dailogo de elegir idioma.
     @Override
     public void alElegirIdioma(int i) {
         int tiempoToast= Toast.LENGTH_SHORT;
-        CharSequence[] opciones = {"Inglés", "Español", "Euskera"};
-        Toast avisoIdiomaCambiado = Toast.makeText(this, "Idioma cambiado a: " + opciones[i], tiempoToast);
+        CharSequence[] opciones = {getString(R.string.English), getString(R.string.Spanish), getString(R.string.Euskera)};
+        Toast avisoIdiomaCambiado = Toast.makeText(this, getString(R.string.language_changed_to) + opciones[i], tiempoToast);
 
         guardarPreferenciaIdioma((String) opciones[i]);
 
@@ -358,11 +413,12 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
         avisoIdiomaCambiado.show();
     }
 
+    //Implementamos el metodo del dailogo de elegir estilo
     @Override
     public void alElegirEstilo(int i) {
         int tiempoToast= Toast.LENGTH_SHORT;
-        CharSequence[] opciones = {"Dark", "Normal"};
-        Toast avisoEstiloCambiado = Toast.makeText(this, "Estilo cambiado a: " + opciones[i], tiempoToast);
+        CharSequence[] opciones = {"Dark", getString(R.string.normal)};
+        Toast avisoEstiloCambiado = Toast.makeText(this, getString(R.string.style_changed_to) + opciones[i], tiempoToast);
         avisoEstiloCambiado.show();
 
         guardarPreferenciaEstilo((String) opciones[i]);
@@ -377,6 +433,7 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
         }
     }
 
+    //Guardar las preferencias de estilo
     public void guardarPreferenciaEstilo(String tema){
         SharedPreferences preferences = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -384,6 +441,7 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
         editor.commit();
     }
 
+    //Guardar las preferencias de idioma
     public void guardarPreferenciaIdioma(String idioma){
         SharedPreferences preferences = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -391,6 +449,7 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
         editor.commit();
     }
 
+    //Actualizar lo que se ve dependiendo del tamaño de la lista.
     private void actualizarVacioLleno(ArrayList<Grupo> grupos) {
 
         if(grupos.size() > 0) {

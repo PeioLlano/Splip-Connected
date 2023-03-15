@@ -1,4 +1,4 @@
-package com.example.primerproyecto;
+package com.example.primerproyecto.Actividades;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.example.primerproyecto.BBDD.BBDD;
 import com.example.primerproyecto.Dialogs.EstiloDialog;
 import com.example.primerproyecto.Dialogs.IdiomaDialog;
+import com.example.primerproyecto.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Locale;
@@ -41,29 +42,36 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
+        //Abrimos la conexion con la base de datos
         BBDD gestorBBDD = new BBDD(this, "SpliP", null, 1);
         bbdd = gestorBBDD.getWritableDatabase();
 
+        //Pedimos los permisos para notificaciones si es que no los tenemos
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)!=
                 PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new
                     String[]{Manifest.permission.POST_NOTIFICATIONS}, 11);
         }
 
-        EditText eUsername = (EditText) findViewById(R.id.eUsername);
-        EditText ePassword = (EditText) findViewById(R.id.ePassword);
+        EditText eUsername = findViewById(R.id.eUsername);
+        EditText ePassword = findViewById(R.id.ePassword);
 
-        Button bSingIn = (Button) findViewById(R.id.bSignIn);
+        Button bSingIn = findViewById(R.id.bSignIn);
 
         int tiempoToast= Toast.LENGTH_SHORT;
-        Toast avisoInicioIncorrecto = Toast.makeText(this, "Credenciales incorrectas, intentelo de nuevo.", tiempoToast);
 
+        //Inicializar toast de inicio incorreto
+        Toast avisoInicioIncorrecto = Toast.makeText(this, getString(R.string.incorrect_cred), tiempoToast);
+
+        //Boton para iniciar sesion
         bSingIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                //Bucamos si en la base de datos exites un suarios con dichos nombre y contraseña
                 Cursor c = bbdd.rawQuery("SELECT Usuario, Contraseña FROM Usuarios WHERE Usuario = ? AND Contraseña = ?", new String[]{eUsername.getText().toString(), ePassword.getText().toString()});
 
+                //Si hay algun usuario pasamos a la lista de grupos de ese usuario
                 if (c.getCount() != 0) {
                     Intent intent = new Intent(Login.this, ListGrupos.class);
 
@@ -75,12 +83,15 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
                     startActivity(intent);
                     Login.this.finish();
                 }
+                //Si no lo hay mostramos el toast de inicio incorrecto
                 else {
                     avisoInicioIncorrecto.show();
                 }
             }
         });
 
+
+        //Boton que nos mostrara el dialogo de cambio de idioma.
         FloatingActionButton bLanguage = (FloatingActionButton) findViewById(R.id.bLanguage);
         bLanguage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,6 +101,7 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
             }
         });
 
+        //Boton que nos mostrara el dialogo de cambio de estilo.
         FloatingActionButton bStyle = (FloatingActionButton) findViewById(R.id.bStyle);
         bStyle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,6 +119,7 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
 
         final Boolean[] clicadoAjustes = {false};
 
+        //Si pulsamos el boton de ajustes deplegamos o recogemos botones dependiendo del caso
         FloatingActionButton bSettings = (FloatingActionButton) findViewById(R.id.bMail);
         bSettings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,6 +154,7 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
             }
         });
 
+        //Boton que no llevara a la actividad de registro de cuenta
         Button bSignUp = (Button) findViewById(R.id.bSignUp);
         bSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,11 +165,12 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
         });
     }
 
+    //Implementamos el metodo del dailogo de elegir idioma.
     @Override
     public void alElegirIdioma(int i) {
         int tiempoToast= Toast.LENGTH_SHORT;
-        CharSequence[] opciones = {"Inglés", "Español", "Euskera"};
-        Toast avisoIdiomaCambiado = Toast.makeText(this, "Idioma cambiado a: " + opciones[i], tiempoToast);
+        CharSequence[] opciones = {getString(R.string.English), getString(R.string.Spanish), getString(R.string.Euskera)};
+        Toast avisoIdiomaCambiado = Toast.makeText(this, getString(R.string.language_changed_to) + opciones[i], tiempoToast);
 
         guardarPreferenciaIdioma((String) opciones[i]);
 
@@ -203,6 +218,27 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
         avisoIdiomaCambiado.show();
     }
 
+    //Implementamos el metodo del dailogo de elegir estilo
+    @Override
+    public void alElegirEstilo(int i) {
+        int tiempoToast= Toast.LENGTH_SHORT;
+        CharSequence[] opciones = {"Dark", getString(R.string.normal)};
+        Toast avisoEstiloCambiado = Toast.makeText(this, getString(R.string.style_changed_to) + opciones[i], tiempoToast);
+        avisoEstiloCambiado.show();
+
+        guardarPreferenciaEstilo((String) opciones[i]);
+
+        switch (i) {
+            case 0:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case 1:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+        }
+    }
+
+    //Al tratar de cerrar la app preguntamos si esta seguro mediante dialogo
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this)
@@ -216,25 +252,7 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
                 }).create().show();
     }
 
-    @Override
-    public void alElegirEstilo(int i) {
-        int tiempoToast= Toast.LENGTH_SHORT;
-        CharSequence[] opciones = {"Dark", "Normal"};
-        Toast avisoEstiloCambiado = Toast.makeText(this, "Estilo cambiado a: " + opciones[i], tiempoToast);
-        avisoEstiloCambiado.show();
-
-        guardarPreferenciaEstilo((String) opciones[i]);
-
-        switch (i) {
-            case 0:
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            break;
-            case 1:
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                break;
-        }
-    }
-
+    //Si esta logeado algun usuario gestionar que se vaya a su lista de grupos
     public void cargarLogeado() {
         SharedPreferences preferences = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -251,6 +269,7 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
         }
     }
 
+    //Cargar las preferencia de estilo y de idioma utilizando las preferencias guardadas previamente
     public void cargarPreferencias(){
         SharedPreferences preferences = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -303,6 +322,7 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
 
     }
 
+    //Guardar las preferencias de estilo
     public void guardarPreferenciaEstilo(String tema){
         SharedPreferences preferences = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -310,6 +330,7 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
         editor.commit();
     }
 
+    //Guardar las preferencias del usuario que ha iniciado sesion
     public void guardarPreferenciaLogin(String user){
         SharedPreferences preferences = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -317,6 +338,7 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
         editor.commit();
     }
 
+    //Guardar las preferencias de idioma
     public void guardarPreferenciaIdioma(String idioma){
         SharedPreferences preferences = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();

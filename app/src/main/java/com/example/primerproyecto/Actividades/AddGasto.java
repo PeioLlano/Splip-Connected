@@ -1,4 +1,4 @@
-package com.example.primerproyecto;
+package com.example.primerproyecto.Actividades;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.primerproyecto.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -20,25 +21,30 @@ public class AddGasto extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_gasto);
 
-        EditText eCantidad = (EditText) findViewById(R.id.eCantidad);
-        EditText eNombre = (EditText) findViewById(R.id.eNombre);
+        EditText eCantidad = findViewById(R.id.eCantidad);
+        EditText eNombre = findViewById(R.id.eNombre);
 
-        Spinner sAutor = (Spinner) findViewById(R.id.sAutor);
+        Spinner sAutor = findViewById(R.id.sAutor);
 
+        //Recibimos los posibles autores del gasto para poder ponerlos en el spinner
         Bundle extras = getIntent().getExtras();
         ArrayList<String> posiblesAutores = null;
         if (extras != null) {
             posiblesAutores = extras.getStringArrayList("posiblesAutores");
         }
 
+        //Motamos el spinner con la lista de posibles autores
         ArrayAdapter adapter = new ArrayAdapter(this, R.layout.spinner_texto, posiblesAutores);
         adapter.setDropDownViewResource(R.layout.spinner_drop);
         sAutor.setAdapter(adapter);
 
-        FloatingActionButton bGuardar = (FloatingActionButton) findViewById(R.id.bGuardar);
+        //Boton que usaremos para guardar los gastos
+        FloatingActionButton bGuardar = findViewById(R.id.bGuardar);
         bGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //Si todos los campos estan rellenos devolvemos los datos que se han rellenado a MainGrupo para que los gestione
                 if (todo_relleno(eNombre.getText().toString(), eCantidad.getText().toString(), sAutor.getSelectedItem().toString())) {
                     Intent intent = new Intent();
 
@@ -49,15 +55,17 @@ public class AddGasto extends AppCompatActivity {
                     setResult(RESULT_OK, intent);
                     finish();
                 }
+                //En caso contrario se muestra un Toast.
                 else{
                     int tiempoToast= Toast.LENGTH_SHORT;
-                    Toast avisoGasto = Toast.makeText(view.getContext(), "Rellene todos los campos.", tiempoToast);
+                    Toast avisoGasto = Toast.makeText(view.getContext(), getString(R.string.fill_fields), tiempoToast);
                     avisoGasto.show();
                 }
             }
         });
 
-        FloatingActionButton bAtras = (FloatingActionButton) findViewById(R.id.bAtras);
+        //En caso de pulsar el boton para retroceder, pondremos el flag que indique que no se a completado correctamente lo que se deberia de haber hecho.
+        FloatingActionButton bAtras = findViewById(R.id.bAtras);
         bAtras.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,6 +76,7 @@ public class AddGasto extends AppCompatActivity {
         });
     }
 
+    //Comprobar si todos los campos son rellenos.
     private boolean todo_relleno(String nombre, String cantidad, String persona) {
         return ((!nombre.equals("")) && (!cantidad.equals("")) && (!persona.equals("")));
     }
