@@ -91,6 +91,10 @@ public class Grupo implements Serializable {
     }
 
     public ArrayList<Pago> ajustarCuentas(){
+
+        DecimalFormat df = new DecimalFormat("#.##");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+
         if ((gastos.size()==0) && (pagos.size()==0)) return new ArrayList<>();
         ArrayList<Pago> ajuste = new ArrayList<>();
         ArrayList<Persona> personasAjustadas = new ArrayList<>();
@@ -101,7 +105,7 @@ public class Grupo implements Serializable {
         }
 
         for (Persona p: personasAjustadas) {
-            if (p.getBalance() != 0.0f) {
+            if ((-0.05f < p.getBalance() ) && (p.getBalance() > 0.05f)) {
                 ajustado = false;
                 break;
             }
@@ -119,7 +123,7 @@ public class Grupo implements Serializable {
             pMaxDeudor.setBalance(pMaxDeudor.getBalance() - cantidadPago);
             pMaxAcreedor.setBalance(pMaxAcreedor.getBalance() + cantidadPago);
 
-            ajuste.add(new Pago(-1, cantidadPago , pMaxDeudor,pMaxAcreedor, null));
+            ajuste.add(new Pago(-1, Float.valueOf(df.format(cantidadPago).replace(',', '.')) , pMaxDeudor,pMaxAcreedor, null));
 
             ajustado = true;
             for (Persona p: personasAjustadas) {
@@ -135,9 +139,9 @@ public class Grupo implements Serializable {
 
     private Persona maxDeudor(ArrayList<Persona> personasAjustadas){
         Persona pResultado = null;
-        Float maxDeudorF = 0.0f;
+        Float maxDeudorF = 0.5f;
         for (Persona p: personasAjustadas) {
-            if (p.getBalance() > maxDeudorF){
+            if (p.getBalance() >= maxDeudorF){
                 maxDeudorF = p.getBalance();
                 pResultado = p;
             }
@@ -147,9 +151,9 @@ public class Grupo implements Serializable {
 
     private Persona maxAcreedor(ArrayList<Persona> personasAjustadas){
         Persona pResultado = null;
-        Float maxAcreedorF = 0.0f;
+        Float maxAcreedorF = -0.5f;
         for (Persona p: personasAjustadas) {
-            if (p.getBalance() < maxAcreedorF){
+            if (p.getBalance() <= maxAcreedorF){
                 maxAcreedorF = p.getBalance();
                 pResultado = p;
             }

@@ -71,4 +71,5 @@
     <string name="dark">Iluna</string>
     <string name="delete_expense">Gastua ezabatu nahi duzu?</string>
     <string name="delete_payment">Ordainketa ezabatu nahi duzu?</string>
+    <string name="Titulo">Izenburua</string>
 </resources>

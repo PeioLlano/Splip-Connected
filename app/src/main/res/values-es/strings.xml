@@ -71,4 +71,5 @@
     <string name="dark">Oscuro</string>
     <string name="delete_expense">¿Quiere eliminar el gasto?</string>
     <string name="delete_payment">¿Quiere eliminar el pago?</string>
+    <string name="Titulo">Titulo</string>
 </resources>

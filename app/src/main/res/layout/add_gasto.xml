@@ -57,7 +57,7 @@
             android:drawableStart="@drawable/persona"
             android:drawablePadding="12dp"
             android:ems="10"
-            android:hint="@string/name_placeholder"
+            android:hint="@string/Titulo"
             android:inputType="textPersonName"
             android:minHeight="48dp"
             android:paddingStart="10dp"

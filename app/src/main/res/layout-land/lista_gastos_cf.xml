@@ -8,7 +8,7 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView1"
         android:name="com.example.primerproyecto.Fragments.ListGastosF"
-        android:layout_width="424dp"
+        android:layout_width="400dp"
         android:layout_height="match_parent"
         tools:ignore="MissingConstraints"
         tools:layout="@layout/lista_gastos"

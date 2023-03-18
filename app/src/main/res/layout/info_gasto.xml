@@ -126,10 +126,11 @@
 
             <TextView
                 android:id="@+id/tPagosTexto"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
+                android:layout_width="274dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:minHeight="35dp"
                 android:paddingStart="15dp"
                 android:text="@string/Date"
                 android:textAlignment="textStart"
@@ -138,11 +139,13 @@
 
             <TextView
                 android:id="@+id/tFecha"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:minHeight="35dp"
                 android:paddingEnd="15dp"
+                android:paddingBottom="10dp"
                 android:text="0"
                 android:textAlignment="textEnd"
                 android:textSize="18sp"

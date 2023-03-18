@@ -37,11 +37,11 @@ public class BBDD extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("INSERT INTO Personas ('Usuario', 'Grupo', 'Nombre') VALUES ('admin','Viaje a Malaga', 'Patxi')");
         sqLiteDatabase.execSQL("INSERT INTO Personas ('Usuario', 'Grupo', 'Nombre') VALUES ('admin','Viaje a Malaga', 'Madalen')");
 
-        sqLiteDatabase.execSQL("INSERT INTO Gastos ('Usuario', 'Grupo', 'Persona','Titulo', 'Cantidad', 'Fecha') VALUES ('admin','Viaje a Malaga', 'Madalen', 'Cena pizzeria', '56.8', '10-01-2023')");
-        sqLiteDatabase.execSQL("INSERT INTO Gastos ('Usuario', 'Grupo', 'Persona','Titulo', 'Cantidad', 'Fecha') VALUES ('admin','Viaje a Malaga', 'Ander', 'Gasolina', '80.6', '12-01-2023')");
+        sqLiteDatabase.execSQL("INSERT INTO Gastos ('Usuario', 'Grupo', 'Persona','Titulo', 'Cantidad', 'Fecha') VALUES ('admin','Viaje a Malaga', 'Madalen', 'Cena pizzeria', '56.8', 'Sat Mar 18 10:52:26 GMT 2023')");
+        sqLiteDatabase.execSQL("INSERT INTO Gastos ('Usuario', 'Grupo', 'Persona','Titulo', 'Cantidad', 'Fecha') VALUES ('admin','Viaje a Malaga', 'Ander', 'Gasolina', '80.6', 'Sat Mar 18 10:52:26 GMT 2023')");
 
-        sqLiteDatabase.execSQL("INSERT INTO Pagos ('Usuario', 'Grupo', 'PersonaAutora','PersonaDestinataria', 'Cantidad', 'Fecha') VALUES ('admin','Viaje a Malaga', 'Peio', 'Ander', '20.15', '17-01-2023')");
-        sqLiteDatabase.execSQL("INSERT INTO Pagos ('Usuario', 'Grupo', 'PersonaAutora','PersonaDestinataria', 'Cantidad', 'Fecha') VALUES ('admin','Viaje a Malaga', 'Patxi', 'Madalen', '10', '13-01-2023')");
+        sqLiteDatabase.execSQL("INSERT INTO Pagos ('Usuario', 'Grupo', 'PersonaAutora','PersonaDestinataria', 'Cantidad', 'Fecha') VALUES ('admin','Viaje a Malaga', 'Peio', 'Ander', '20.15', 'Sat Mar 18 10:52:26 GMT 2023')");
+        sqLiteDatabase.execSQL("INSERT INTO Pagos ('Usuario', 'Grupo', 'PersonaAutora','PersonaDestinataria', 'Cantidad', 'Fecha') VALUES ('admin','Viaje a Malaga', 'Patxi', 'Madalen', '10', 'Sat Mar 18 10:52:26 GMT 2023')");
     }
 
     @Override

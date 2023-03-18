@@ -25,6 +25,12 @@ public class SignUp extends AppCompatActivity{
     SQLiteDatabase bbdd;
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        bbdd.close();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);

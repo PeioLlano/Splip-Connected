@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
@@ -45,6 +46,31 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
     ListView lGrupos;
     LinearLayout lVacia;
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        bbdd.close();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        for (Grupo gru: arraydedatos) {
+            Cursor c2 = bbdd.rawQuery("SELECT * FROM Personas WHERE Grupo = ? AND Usuario = ?", new String[]{gru.getTitulo(), username});
+
+            if (c2.moveToFirst()) {
+                do {
+                    String Nombre = c2.getString(2);
+
+                    if (!gru.tieneNombre(Nombre)) gru.getPersonas().add(new Persona(Nombre, 0f, 0, 0));
+                } while (c2.moveToNext());
+            }
+        }
+
+
+        pAdapter.notifyDataSetChanged();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -54,6 +55,12 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
     String username;
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        bbdd.close();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_grupo);
@@ -87,10 +94,11 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                 Float Cantidad = c.getFloat(5);
 
                 Date Fecha;
-                try {
-                    Fecha = new SimpleDateFormat("YYYY-MM-DD").parse(c.getString(5));
-                } catch (ParseException e) {
-                    Fecha = null;
+                try{
+                    Fecha = new Date(c.getString(6));
+                }
+                catch (Exception e){
+                    Fecha = new Date();
                 }
 
                 if(!grupo.gastoMetido(Codigo)){
@@ -111,10 +119,11 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                 Float Cantidad = c.getFloat(5);
 
                 Date Fecha;
-                try {
-                    Fecha = new SimpleDateFormat("YYYY-MM-DD").parse(c.getString(5));
-                } catch (ParseException e) {
-                    Fecha = null;
+                try{
+                    Fecha = new Date(c.getString(6));
+                }
+                catch (Exception e){
+                    Fecha = new Date();
                 }
 
                 if(!grupo.pagoMetido(Codigo)) {
@@ -274,18 +283,7 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
 
                             long row = bbdd.insert("Gastos", null, contentValues);
 
-                            Cursor c = bbdd.rawQuery("SELECT rowid, codigo FROM Gastos WHERE Grupo = ? AND Persona = ? AND Titulo = ? AND Usuario = ?", new String[]{grupo.getTitulo(), grupo.getTitulo(), autor, username});
-                            Integer codigo = null;
-
-                            if (c.moveToFirst()){
-                                do{
-                                    if (c.getInt(0) == row){
-                                        codigo = c.getInt(1);
-                                    }
-                                }while(c.moveToNext());
-                            }
-
-                            addGasto(new Gasto(codigo, nombre, Float.parseFloat(cantidad), getPersonaByName(autor), date), getPersonaByName(autor));
+                            addGasto(new Gasto((int) row, nombre, Float.parseFloat(cantidad), getPersonaByName(autor), date), getPersonaByName(autor));
 
                             lPersonas.setAdapter(pAdapter);
 
@@ -341,18 +339,7 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
 
                             long row = bbdd.insert("Pagos", null, contentValues);
 
-                            Cursor c = bbdd.rawQuery("SELECT rowid, codigo FROM Pagos WHERE Grupo = ? AND PersonaAutora = ? AND PersonaDestinataria = ? AND Usuario = ?", new String[]{grupo.getTitulo(), autor, destinatario, username});
-                            Integer codigo = null;
-
-                            if (c.moveToFirst()){
-                                do{
-                                    if (c.getInt(0) == row){
-                                        codigo = c.getInt(1);
-                                    }
-                                }while(c.moveToNext());
-                            }
-
-                            addPago(new Pago(codigo, Float.parseFloat(cantidad), getPersonaByName(autor), getPersonaByName(destinatario), date), getPersonaByName(autor));
+                            addPago(new Pago((int) row, Float.parseFloat(cantidad), getPersonaByName(autor), getPersonaByName(destinatario), date), getPersonaByName(autor));
 
                             lPersonas.setAdapter(pAdapter);
 
@@ -389,9 +376,10 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                         if (result.getResultCode() == RESULT_OK) {
                             ArrayList<Integer> borrados = result.getData().getIntegerArrayListExtra("pagosBorrados");
 
+                            pAdapter.notifyDataSetChanged();
                             for (Integer i: borrados) {
                                 for (Pago g: grupo.getPagos()) {
-                                    if (g.getCodigo().equals(i)){
+                                    if (g.getCodigo() == i){
                                         grupo.getPagos().remove(g);
                                         grupo.actualizarBalances();
 
@@ -433,7 +421,7 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
 
                         for (Integer i: borrados) {
                             for (Gasto g: grupo.getGastos()) {
-                                if (g.getCodigo().equals(i)){
+                                if (g.getCodigo() == i){
                                     grupo.getGastos().remove(g);
                                     grupo.actualizarBalances();
 

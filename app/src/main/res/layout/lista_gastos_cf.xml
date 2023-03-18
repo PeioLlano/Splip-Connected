@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".Actividades.ListGastosCF">
+    tools:context=".Actividades.ListGastosCF"
+    android:orientation="horizontal">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView1"
@@ -15,4 +16,14 @@
         tools:layout_editor_absoluteX="30dp"
         tools:layout_editor_absoluteY="26dp" />
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView2"
+        android:name="com.example.primerproyecto.Fragments.InfoGastoF"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:ignore="MissingConstraints"
+        tools:layout="@layout/info_gasto"
+        tools:layout_editor_absoluteX="30dp"
+        tools:layout_editor_absoluteY="26dp"
+        android:visibility="invisible"/>
 </LinearLayout>

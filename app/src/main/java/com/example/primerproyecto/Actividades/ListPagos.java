@@ -61,7 +61,7 @@ public class ListPagos extends AppCompatActivity {
         //Generar el dialogo que se deberia de ver si pulsamos por un tiempo prolongado un a persona
         AlertDialog.Builder builderG = new AlertDialog.Builder(this);
         builderG.setCancelable(true);
-        builderG.setTitle(getString(R.string.delete_expense));
+        builderG.setTitle(getString(R.string.delete_payment));
         builderG.setPositiveButton(R.string.confirm,
                 new DialogInterface.OnClickListener() {
                     @Override

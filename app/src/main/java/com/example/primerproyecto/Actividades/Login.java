@@ -35,6 +35,12 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
     SQLiteDatabase bbdd;
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        bbdd.close();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         cargarPreferencias();
         cargarLogeado();

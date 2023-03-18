@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import com.example.primerproyecto.R;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class InfoGastoF extends Fragment {
@@ -41,17 +43,29 @@ public class InfoGastoF extends Fragment {
         eNombre = (EditText) view.findViewById(R.id.eNombre);
         eNombre.setText(nombre);
         tCantidad = (TextView) view.findViewById(R.id.tCantidad);
-        tCantidad.setText(String.valueOf(cantidad));
+        if (cantidad != null) {
+            tCantidad.setText(String.valueOf(cantidad));
+        }
+        else{
+            tCantidad.setText("");
+        }
         tAutor = (TextView) view.findViewById(R.id.tAutor);
         tAutor.setText(autor);
         tFecha = (TextView) view.findViewById(R.id.tFecha);
-        tFecha.setText(String.valueOf(fecha));
+        if (fecha != null) {
+            tFecha.setText(fecha.toString());
+        }
+        else{
+            tFecha.setText("");
+        }
     }
 
     public void actualizarDatos(String nombre, String autor, Float cantidad, Date fecha) {
         eNombre.setText(nombre);
         tAutor.setText(autor);
-        tFecha.setText(String.valueOf(fecha));
+
+        tFecha.setText(fecha.toString());
+
         tCantidad.setText(String.valueOf(cantidad));
     }
 }

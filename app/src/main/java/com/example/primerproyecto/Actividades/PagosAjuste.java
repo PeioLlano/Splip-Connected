@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -75,10 +77,13 @@ public class PagosAjuste extends AppCompatActivity implements PagosAjusteAdapter
                     e.printStackTrace();
                 }
 
+                DecimalFormat df = new DecimalFormat("#.##");
+                df.setRoundingMode(RoundingMode.HALF_UP);
+
                 System.out.println(String.format(asunto, grupo.getTitulo()));
                 String body = entrada_cuerpo + "\n \n";
                 for (Pago p: pagosAjuste) {
-                    body +=  "\t" + String.format(modelo_linea_cuerpo, p.getAutor().getNombre(), p.getDestinatario().getNombre(), p.getCantidad()) + "\n";
+                    body +=  "\t" + String.format(modelo_linea_cuerpo, p.getAutor().getNombre(), p.getDestinatario().getNombre(), df.format(p.getCantidad())) + "\n";
                 }
                 body += "\n" + final_cuerpo;
 
