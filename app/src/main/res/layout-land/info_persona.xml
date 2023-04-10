@@ -32,6 +32,17 @@
         app:srcCompat="@drawable/guardar"
         tools:ignore="SpeakableTextPresentCheck" />
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="61dp"
+        app:layout_constraintBottom_toBottomOf="@+id/linearVertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.041"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/eNombre"
+        app:srcCompat="@drawable/persona" />
 
     <EditText
         android:id="@+id/eNombre"
@@ -49,7 +60,7 @@
         android:textAlignment="center"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
@@ -57,6 +68,7 @@
         android:id="@+id/linearVertical"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="32dp"
         android:divider="@drawable/distancia_linear_layout"
@@ -64,7 +76,7 @@
         android:showDividers="middle"
         app:layout_constraintBottom_toTopOf="@+id/bGuardar"
         app:layout_constraintEnd_toEndOf="@+id/eNombre"
-        app:layout_constraintStart_toStartOf="@+id/eNombre"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toBottomOf="@+id/eNombre">
 
         <LinearLayout
