@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -39,7 +38,6 @@ import com.example.primerproyecto.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -457,6 +455,22 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
         TextView tExpListGastos = (TextView) findViewById(R.id.tExpListGastos);
 
         //--------------------------------------------------------------------------------------------------------------
+        //                                          VER GASTOS LOCALIZADOS
+        //--------------------------------------------------------------------------------------------------------------
+
+        //Boton que nos mandara mediante un intent a la actividad de ver gastos localizados
+        FloatingActionButton bVerGastosLocalizados = (FloatingActionButton) findViewById(R.id.bVerGastosLocalizados);
+
+        bVerGastosLocalizados.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intentGastos = new Intent(MainGrupo.this, MapaGastos.class);
+                intentGastos.putExtra("grupo", grupo);
+                startActivity(intentGastos);
+            }
+        });
+
+        //--------------------------------------------------------------------------------------------------------------
         //                                           OPCIONES
         //--------------------------------------------------------------------------------------------------------------
 
@@ -499,6 +513,9 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
 
                     bVerPagos.setVisibility(View.INVISIBLE);
                     bVerPagos.setClickable(false);
+
+                    bVerGastosLocalizados.setVisibility(View.INVISIBLE);
+                    bVerGastosLocalizados.setClickable(false);
 
                     tListPagos.setVisibility(View.INVISIBLE);
                     tExpListPagos.setVisibility(View.INVISIBLE);
@@ -554,6 +571,9 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                     bVerPagos.setVisibility(View.VISIBLE);
                     bVerPagos.setClickable(true);
 
+                    bVerGastosLocalizados.setVisibility(View.VISIBLE);
+                    bVerGastosLocalizados.setClickable(true);
+
                     tListPagos.setVisibility(View.VISIBLE);
                     tExpListPagos.setVisibility(View.VISIBLE);
 
@@ -591,6 +611,9 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
 
                     bVerPagos.setVisibility(View.INVISIBLE);
                     bVerPagos.setClickable(false);
+
+                    bVerGastosLocalizados.setVisibility(View.INVISIBLE);
+                    bVerGastosLocalizados.setClickable(false);
 
                     tListPagos.setVisibility(View.INVISIBLE);
                     tExpListPagos.setVisibility(View.INVISIBLE);

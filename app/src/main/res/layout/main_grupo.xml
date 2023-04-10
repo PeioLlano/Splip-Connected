@@ -218,6 +218,19 @@
         app:srcCompat="@drawable/flecha_derecha"
         tools:ignore="SpeakableTextPresentCheck" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/bVerGastosLocalizados"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:clickable="false"
+        android:visibility="invisible"
+        app:backgroundTint="@android:color/holo_orange_dark"
+        app:layout_constraintBottom_toTopOf="@+id/bVerPagos"
+        app:layout_constraintStart_toStartOf="@+id/bVerPagos"
+        app:srcCompat="@drawable/location"
+        tools:ignore="SpeakableTextPresentCheck" />
+
     <TextView
         android:id="@+id/tPlusPersona"
         android:layout_width="wrap_content"
