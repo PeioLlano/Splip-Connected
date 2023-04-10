@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SpliP</string>
+    <string name="app_name">SpliP Connected</string>
     <string name="boton_login">Entrar</string>
     <string name="username_placeholder">Usuario</string>
     <string name="password_placeholder">Contraseña</string>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SpliP</string>
+    <string name="app_name">SpliP Connected</string>
     <string name="boton_login">Sign In</string>
     <string name="username_placeholder">Username</string>
     <string name="password_placeholder">Password</string>
