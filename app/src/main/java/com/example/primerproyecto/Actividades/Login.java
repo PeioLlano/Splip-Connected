@@ -1,11 +1,5 @@
 package com.example.primerproyecto.Actividades;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
@@ -22,11 +15,29 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+
 import com.example.primerproyecto.BBDD.BBDD;
 import com.example.primerproyecto.Dialogs.EstiloDialog;
 import com.example.primerproyecto.Dialogs.IdiomaDialog;
 import com.example.primerproyecto.R;
+import com.example.primerproyecto.Workers.TokenWorker;
+import com.example.primerproyecto.Workers.SelectWorker;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.Locale;
 
@@ -66,33 +77,13 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
 
         int tiempoToast= Toast.LENGTH_SHORT;
 
-        //Inicializar toast de inicio incorreto
-        Toast avisoInicioIncorrecto = Toast.makeText(this, getString(R.string.incorrect_cred), tiempoToast);
-
         //Boton para iniciar sesion
         bSingIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //Bucamos si en la base de datos exites un suarios con dichos nombre y contraseña
-                Cursor c = bbdd.rawQuery("SELECT Usuario, Contraseña FROM Usuarios WHERE Usuario = ? AND Contraseña = ?", new String[]{eUsername.getText().toString(), ePassword.getText().toString()});
+                comprobarLogeo(eUsername.getText().toString(), ePassword.getText().toString());
 
-                //Si hay algun usuario pasamos a la lista de grupos de ese usuario
-                if (c.getCount() != 0) {
-                    Intent intent = new Intent(Login.this, ListGrupos.class);
-
-                    c.moveToFirst();
-                    intent.putExtra("usuario", c.getString(0));
-
-                    guardarPreferenciaLogin(eUsername.getText().toString());
-
-                    startActivity(intent);
-                    Login.this.finish();
-                }
-                //Si no lo hay mostramos el toast de inicio incorrecto
-                else {
-                    avisoInicioIncorrecto.show();
-                }
             }
         });
 
@@ -169,6 +160,91 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
                 startActivity(intent_registro);
             }
         });
+    }
+
+    private void comprobarLogeo(String username, String password) {
+
+        //Inicializar toast de inicio incorreto
+        int tiempoToast= Toast.LENGTH_SHORT;
+        Toast avisoInicioIncorrecto = Toast.makeText(this, getString(R.string.incorrect_cred), tiempoToast);
+
+        if (!(username.isEmpty() || password.isEmpty())) {
+
+            Data data = new Data.Builder()
+                    .putString("table", "Usuarios")
+                    .putString("condicion", "Usuario="+username+" AND Contraseña=" + password)
+                    .build();
+
+            Constraints constr = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
+
+            OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(SelectWorker.class)
+                    .setConstraints(constr)
+                    .setInputData(data)
+                    .build();
+
+            WorkManager.getInstance(this).getWorkInfoByIdLiveData(req.getId())
+                    .observe(this, status -> {
+                        if (status != null && status.getState().isFinished()) {
+                            String id_user = status.getOutputData().getString("datos");
+                            if(!id_user.isEmpty()) {
+                                Intent intent = new Intent(Login.this, ListGrupos.class);
+                                intent.putExtra("usuario", username);
+                                subirTokenFirebase(username);
+                                guardarPreferenciaLogin(username);
+                                startActivity(intent);
+                                Login.this.finish();
+                            }
+                            //En caso contrario el toast de inicio incorrecto
+                            else {
+                                avisoInicioIncorrecto.show();
+                            }
+                        }
+                    });
+            WorkManager.getInstance(this).enqueue(req);
+
+        }//En caso contrario el toast de inicio incorrecto
+        else {
+            avisoInicioIncorrecto.show();
+        }
+    }
+
+    private void subirTokenFirebase(String username) {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            task.getException();
+                        }
+
+                        String token = task.getResult().getToken();
+
+                        try {
+                            Data tokenData = new Data.Builder()
+                                    .putString("usuario", username)
+                                    .putString("token", token)
+                                    .build();
+
+                            Constraints constr = new Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                                    .build();
+
+                            OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(TokenWorker.class)
+                                    .setConstraints(constr)
+                                    .setInputData(tokenData)
+                                    .build();
+
+                            WorkManager.getInstance(Login.this).getWorkInfoByIdLiveData(req.getId());
+
+                            WorkManager.getInstance(Login.this).enqueue(req);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
     //Implementamos el metodo del dailogo de elegir idioma.

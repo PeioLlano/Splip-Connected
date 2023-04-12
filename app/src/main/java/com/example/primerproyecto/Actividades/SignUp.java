@@ -13,9 +13,16 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import com.example.primerproyecto.BBDD.BBDD;
 import com.example.primerproyecto.R;
+import com.example.primerproyecto.Workers.InsertWorker;
+import com.example.primerproyecto.Workers.SelectWorker;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,21 +63,7 @@ public class SignUp extends AppCompatActivity{
                     if (isValidEmailAddress(eMail.getText().toString())){
                         if (mismaPass(ePassword.getText().toString(), ePasswordRepeat.getText().toString())){
                             try{
-                                ContentValues contentValues = new ContentValues();
-                                contentValues.put("Usuario", eUsername.getText().toString());
-                                contentValues.put("Contraseña", ePassword.getText().toString());
-
-                                bbdd.insertOrThrow("Usuarios", null, contentValues);
-
-                                guardarPreferenciaLogin(eUsername.getText().toString());
-
-                                Intent intentRegistrado = new Intent(SignUp.this, ListGrupos.class);
-                                intentRegistrado.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                intentRegistrado.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                intentRegistrado.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                intentRegistrado.putExtra("usuario", eUsername.getText().toString());
-                                startActivity(intentRegistrado);
-                                SignUp.this.finish();
+                                registrarUsuario(eUsername.getText().toString(), ePassword.getText().toString());
                             }
                             catch (SQLiteConstraintException e) {
                                 e.printStackTrace();
@@ -94,6 +87,51 @@ public class SignUp extends AppCompatActivity{
                 }
             }
         });
+    }
+
+    private void registrarUsuario(String username, String pass) {
+        //Inicializar toast de inicio incorreto
+        int tiempoToast= Toast.LENGTH_SHORT;
+        Toast avisoInicioIncorrecto = Toast.makeText(this, getString(R.string.user_exist), tiempoToast);
+
+        Data data = new Data.Builder()
+                .putString("Tabla", "Usuario")
+                .putString("Usuario", username)
+                .putString("Contraseña", pass)
+                .build();
+
+        Constraints constr = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+
+        OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(InsertWorker.class)
+                .setConstraints(constr)
+                .setInputData(data)
+                .build();
+
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(req.getId())
+                .observe(this, status -> {
+                    if (status != null && status.getState().isFinished()) {
+                        String id_user = status.getOutputData().getString("datos");
+                        if(!id_user.isEmpty()) {
+
+                            guardarPreferenciaLogin(username);
+
+                            Intent intentRegistrado = new Intent(SignUp.this, ListGrupos.class);
+                            intentRegistrado.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intentRegistrado.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            intentRegistrado.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intentRegistrado.putExtra("usuario", username);
+                            startActivity(intentRegistrado);
+                            SignUp.this.finish();
+                        }
+                        //En caso contrario el toast de inicio incorrecto
+                        else {
+                            avisoInicioIncorrecto.show();
+                        }
+                    }
+                });
+        WorkManager.getInstance(this).enqueue(req);
     }
 
     //Guardar las preferencias del usuario que ha iniciado sesion
