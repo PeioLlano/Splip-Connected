@@ -176,8 +176,8 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
         if (!(username.isEmpty() || password.isEmpty())) {
 
             Data data = new Data.Builder()
-                    .putString("table", "Usuarios")
-                    .putString("condicion", "Usuario="+username+" AND Contraseña=" + password)
+                    .putString("tabla", "Usuarios")
+                    .putString("condicion", "Usuario='"+username+"' AND Contraseña='" + password+"'")
                     .build();
 
             Constraints constr = new Constraints.Builder()
@@ -193,7 +193,8 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
                     .observe(this, status -> {
                         if (status != null && status.getState().isFinished()) {
                             String resultados = status.getOutputData().getString("resultados");
-                            if(resultados != "null") {
+                            if (resultados == "null" || resultados == "") resultados = null;
+                            if(resultados != null) {
                                 Intent intent = new Intent(Login.this, ListGrupos.class);
                                 intent.putExtra("usuario", username);
                                 subirTokenFirebase(username);
@@ -255,7 +256,7 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
     private void scheduleAlarm() {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmaNotiReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         long intervalMillis = 60 * 1000; // 1 minute
         long triggerAtMillis = System.currentTimeMillis() + intervalMillis;
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis, pendingIntent);

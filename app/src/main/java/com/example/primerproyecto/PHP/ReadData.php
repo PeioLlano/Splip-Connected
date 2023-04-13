@@ -13,8 +13,8 @@
         exit();
     }
 
-    $tabla = $_GET["tabla"];
-    $condicion = isset($_GET["condicion"]) ? $_GET["condicion"] : "";
+    $tabla = $_POST["tabla"];
+    $condicion = isset($_POST["condicion"]) ? $_POST["condicion"] : "";
 
     
     $sql = "SELECT * FROM " . $tabla;
@@ -44,5 +44,5 @@
     # Devolver los registros en formato JSON
     echo json_encode($resultado_final);
 
-    $conn->close();
+    $con->close();
 ?>
