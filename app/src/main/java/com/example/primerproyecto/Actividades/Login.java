@@ -1,6 +1,8 @@
 package com.example.primerproyecto.Actividades;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,6 +29,7 @@ import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
+import com.example.primerproyecto.AlarmaNoti.AlarmaNotiReceiver;
 import com.example.primerproyecto.BBDD.BBDD;
 import com.example.primerproyecto.Dialogs.EstiloDialog;
 import com.example.primerproyecto.Dialogs.IdiomaDialog;
@@ -58,6 +61,8 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+
+        scheduleAlarm();
 
         //Abrimos la conexion con la base de datos
         BBDD gestorBBDD = new BBDD(this, "SpliP", null, 1);
@@ -187,8 +192,8 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
             WorkManager.getInstance(this).getWorkInfoByIdLiveData(req.getId())
                     .observe(this, status -> {
                         if (status != null && status.getState().isFinished()) {
-                            String id_user = status.getOutputData().getString("datos");
-                            if(!id_user.isEmpty()) {
+                            String resultados = status.getOutputData().getString("resultados");
+                            if(resultados != "null") {
                                 Intent intent = new Intent(Login.this, ListGrupos.class);
                                 intent.putExtra("usuario", username);
                                 subirTokenFirebase(username);
@@ -246,6 +251,16 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
                     }
                 });
     }
+
+    private void scheduleAlarm() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlarmaNotiReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        long intervalMillis = 60 * 1000; // 1 minute
+        long triggerAtMillis = System.currentTimeMillis() + intervalMillis;
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis, pendingIntent);
+    }
+
 
     //Implementamos el metodo del dailogo de elegir idioma.
     @Override

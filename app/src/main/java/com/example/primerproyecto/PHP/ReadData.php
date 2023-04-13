@@ -13,76 +13,36 @@
         exit();
     }
 
-    $parametros = json_decode( file_get_contents( 'php://input' ), true );
+    $tabla = $_GET["tabla"];
+    $condicion = isset($_GET["condicion"]) ? $_GET["condicion"] : "";
 
-    $tabla = $parametros["tabla"];
-    #$tabla = 'Usuarios';
-    #$condicion = $parametros["condicion"];
+    
+    $sql = "SELECT * FROM " . $tabla;
 
-    # Ejecutar la sentencia SQL
-    # $resultado = mysqli_query($con, "SELECT * FROM '$tabla' '$condicion'");
-    # $resultado = mysqli_query($con, "SELECT * FROM '$tabla'");
-    $resultado = mysqli_query($con, "SELECT * FROM Personas");
+    if (!empty($condicion)) {
+        $sql .= " WHERE " . $condicion;
+    }
+
+    $sql .= ";";
+
+    //echo $sql . "<br>";
+
+    try {
+        $resultado = mysqli_query($con, $sql);
+    } catch (Exception $e) { }
 
     # Comprobar si se ha ejecutado correctamente
     if (!$resultado) {
         echo 'Ha ocurrido algún error: ' . mysqli_error($con);
     }
 
-    #Acceder al resultado
-    // switch ($tabla) {
-    switch ('Personas') {
-        case 'Usuarios':
-            while( $fila = $resultado -> fetch_assoc()){
-                $resultado_final[] = array(
-                        'Usuario' => $fila['Usuario'],
-                        'Contraseña' => $fila['Contraseña']);
-            }            
-            break;
-        case 'Personas':
-            while( $fila = $resultado -> fetch_assoc()){
-                $resultado_final[] = array(
-                        'Usuario' => $fila['Usuario'],
-                        'Grupo' => $fila['Grupo'],
-                        'Nombre' => $fila['Nombre']);
-            }            
-            break;
-        case 'Grupos':
-            while( $fila = $resultado -> fetch_assoc()){
-                $resultado_final[] = array(
-                        'Usuario' => $fila['Usuario'],
-                        'Titulo' => $fila['Titulo'],
-                        'Divisa' => $fila['Divisa']);
-            }            
-            break;
-        case 'Pagos':
-            while( $fila = $resultado -> fetch_assoc()){
-                $resultado_final[] = array(
-                        'Codigo' => $fila['Codigo'],
-                        'Usuario' => $fila['Usuario'],
-                        'Grupo' => $fila['Grupo'],
-                        'PersonaAutora' => $fila['PersonaAutora'],
-                        'PersonaDestinataria' => $fila['PersonaDestinataria'],
-                        'Cantidad' => $fila['Cantidad'],
-                        'Fecha' => $fila['Fecha']);
-            }            
-            break;
-        case 'Gastos':
-            while( $fila = $resultado -> fetch_assoc()){
-                $resultado_final[] = array(
-                        'Codigo' => $fila['Codigo'],
-                        'Usuario' => $fila['Usuario'],
-                        'Grupo' => $fila['Grupo'],
-                        'Persona' => $fila['Persona'],
-                        'Titulo' => $fila['Titulo'],
-                        'Cantidad' => $fila['Cantidad'],
-                        'Fecha' => $fila['Fecha'],
-                        'Latitud' => $fila['Latitud'],
-                        'Latitud' => $fila['Latitud']);
-            }            
-            break;
-    }
-
-    #Devolver el resultado en formato JSON
+    $registros = array();
+    while( $fila = $resultado -> fetch_assoc()){
+        $resultado_final[] = $fila;
+    }            
+    
+    # Devolver los registros en formato JSON
     echo json_encode($resultado_final);
+
+    $conn->close();
 ?>

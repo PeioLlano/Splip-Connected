@@ -1,7 +1,9 @@
 package com.example.primerproyecto.Actividades;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,6 +12,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -704,6 +708,41 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                 ArrayList<Pago> pagosAjuste = grupo.ajustarCuentas();
                 //i.putExtra("pagosAjuste", pagosAjuste);
                 startActivityIntent_AjustarCuentas.launch(i);
+            }
+        });
+
+        FloatingActionButton bImport = findViewById(R.id.bImport);
+        bImport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Obtener un ContentResolver
+                ContentResolver resolver = getContentResolver();
+
+                // Definir las columnas que se quieren obtener
+                String[] columnas = new String[] {
+                        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                };
+
+                // Definir la cláusula WHERE para filtrar los contactos por nombre
+                String filtro = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " LIKE 'SP_%'";
+
+                // Realizar una consulta a los contactos
+                Cursor cursor = resolver.query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        columnas,
+                        filtro,
+                        null,
+                        null
+                );
+
+                // Recorrer los resultados y obtener los nombres y números de teléfono
+                while (cursor.moveToNext()) {
+                    @SuppressLint("Range") String nombre = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                    Log.d("Contactos", "Nombre: " + nombre);
+                }
+
+// Cerrar el cursor
+                cursor.close();
             }
         });
     }
