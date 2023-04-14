@@ -2,8 +2,6 @@ package com.example.primerproyecto.Clases;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.primerproyecto.BBDD.BBDD;
-
 import java.io.Serializable;
 
 public class Persona implements Serializable {

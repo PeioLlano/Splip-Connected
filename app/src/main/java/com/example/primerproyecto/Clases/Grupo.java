@@ -2,8 +2,6 @@ package com.example.primerproyecto.Clases;
 
 import android.util.Log;
 
-import com.example.primerproyecto.BBDD.BBDD;
-
 import java.io.Console;
 import java.io.Serializable;
 import java.math.RoundingMode;

@@ -15,16 +15,29 @@
 
     # Obtener nombre de la tabla
     $tabla = $_POST["tabla"];
+    $condicion = $_POST["condicion"];
 
     # Obtener campos y valores
     $fields = array_keys($_POST);
     array_shift($fields);
+    array_shift($fields);
     $values = array_values($_POST);
     array_shift($values);
-    $fields_str = implode(",", $fields);
-    $values_str = "'" . implode("','", $values) . "'";
+    array_shift($values);
 
-    $sql = "INSERT INTO " . $tabla . " (" . $fields_str . ") VALUES (" . $values_str . ");";
+    $sets = array();
+    foreach ($fields as $key => $field) {
+        $sets[] = $field . "='" . $values[$key] . "'";
+    }
+    $sets_str = implode(",", $sets);
+
+    $sql = "UPDATE " . $tabla . " SET " . $sets_str;
+
+    if (!empty($condicion)) {
+        $sql .= " WHERE " . $condicion;
+    }
+
+    $sql .= ";";
 
     try {
         $resultado = mysqli_query($con, $sql);
@@ -37,14 +50,8 @@
 
     # Ejecutar consulta
     if ($resultado) {
-        $last_id = mysqli_insert_id($con);
-        $response = array('status' => 'success', 'message' => 'Registro insertado con éxito', 'id' => $last_id);
-    } else {
-        $response = array('status' => 'error', 'message' => 'Error al insertar registro: ' . $conn->error);
-    }        
-    
-    # Devolver los registros en formato JSON
-    echo json_encode($response);
+        echo "Ok";    
+    } 
 
     $con->close();
 ?>

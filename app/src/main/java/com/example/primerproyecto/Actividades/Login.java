@@ -30,7 +30,6 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 import com.example.primerproyecto.AlarmaNoti.AlarmaNotiReceiver;
-import com.example.primerproyecto.BBDD.BBDD;
 import com.example.primerproyecto.Dialogs.EstiloDialog;
 import com.example.primerproyecto.Dialogs.IdiomaDialog;
 import com.example.primerproyecto.R;

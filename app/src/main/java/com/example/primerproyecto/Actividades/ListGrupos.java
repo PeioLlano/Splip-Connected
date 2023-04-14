@@ -28,8 +28,6 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
-import com.example.primerproyecto.BBDD.BBDD;
-import com.example.primerproyecto.BBDD.BbDdRemota;
 import com.example.primerproyecto.Dialogs.AddGroupDialog;
 import com.example.primerproyecto.Dialogs.EstiloDialog;
 import com.example.primerproyecto.Dialogs.IdiomaDialog;
@@ -172,7 +170,7 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
                 .observe(this, status -> {
                     if (status != null && status.getState().isFinished()) {
                         String resultados = status.getOutputData().getString("resultados");
-                        if (resultados == "null" || resultados == "") resultados = null;
+                        if (resultados.equals("null") || resultados.equals("")) resultados = null;
                         if(resultados != null) {
                             try {
                                 jsonArray[0] = new JSONArray(resultados);
@@ -484,10 +482,6 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
                                             pAdapter.notifyDataSetChanged();
                                             actualizarVacioLleno(arraydedatos);
                                             posAborrar[0] = -1;
-                                        }
-                                        else {
-                                            Toast aviso = Toast.makeText(getApplicationContext(), getResources().getString(R.string.grupo_existe), Toast.LENGTH_SHORT);
-                                            aviso.show();
                                         }
                                     }});
                     }

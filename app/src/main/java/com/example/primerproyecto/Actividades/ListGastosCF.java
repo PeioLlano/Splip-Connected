@@ -13,7 +13,6 @@ import android.widget.ListView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.primerproyecto.BBDD.BBDD;
 import com.example.primerproyecto.Clases.Gasto;
 import com.example.primerproyecto.Clases.Grupo;
 import com.example.primerproyecto.Fragments.InfoGastoF;

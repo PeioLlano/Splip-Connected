@@ -18,9 +18,9 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class InsertWorker extends Worker {
+public class UpdateWorker extends Worker {
 
-    public InsertWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+    public UpdateWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
 
@@ -29,15 +29,16 @@ public class InsertWorker extends Worker {
     public Result doWork() {
 
         String tabla = getInputData().getString("tabla");
+        String condicion = getInputData().getString("condicion");
         String[] keys = getInputData().getStringArray("keys");
         String[] values = getInputData().getStringArray("values");
 
 
         try {
-            Log.d("statusCode", String.valueOf("http://ec2-54-93-62-124.eu-central-1.compute.amazonaws.com/pllano002/WEB/InsertData.php"));
+            Log.d("statusCode", String.valueOf("http://ec2-54-93-62-124.eu-central-1.compute.amazonaws.com/pllano002/WEB/UpdateData.php"));
 
             HttpURLConnection urlConnection = null;
-            URL url = new URL("http://ec2-54-93-62-124.eu-central-1.compute.amazonaws.com/pllano002/WEB/InsertData.php");
+            URL url = new URL("http://ec2-54-93-62-124.eu-central-1.compute.amazonaws.com/pllano002/WEB/UpdateData.php");
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(5000);
             urlConnection.setReadTimeout(5000);
@@ -49,6 +50,11 @@ public class InsertWorker extends Worker {
 
             Uri.Builder builder = new Uri.Builder()
                     .appendQueryParameter("tabla", tabla);
+
+            if (condicion != null) {
+                Log.d("condicion", condicion);
+                builder.appendQueryParameter("condicion", condicion);
+            }
             for(int i=0; keys.length>i; i++) {
                 Log.d("key-value", keys[i] + " --> " + values[i]);
                 builder.appendQueryParameter(keys[i], values[i]);
@@ -81,21 +87,12 @@ public class InsertWorker extends Worker {
                 }
                 inputStream.close();
 
-                try {
-                    Log.d("resultados", result);
+                Log.d("resultado", result);
 
-                    JSONObject jsonObject = new JSONObject(result);
-
-                    String status = jsonObject.getString("status");
-
-                    if (status.equals("success")) {
-                        resultadosData = new Data.Builder()
-                                .putBoolean("resultado", true)
-                                .putInt("id", jsonObject.getInt("id"))
-                                .build();
-                    }
-                }catch (Exception e) {
-                    e.printStackTrace();
+                if (result.equals("Ok")) {
+                    resultadosData = new Data.Builder()
+                            .putBoolean("resultado", true)
+                            .build();
                 }
             }
 

@@ -19,7 +19,6 @@ import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
-import com.example.primerproyecto.BBDD.BBDD;
 import com.example.primerproyecto.R;
 import com.example.primerproyecto.Workers.InsertWorker;
 import com.example.primerproyecto.Workers.SelectWorker;
@@ -29,12 +28,9 @@ import java.util.regex.Pattern;
 
 public class SignUp extends AppCompatActivity{
 
-    SQLiteDatabase bbdd;
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        bbdd.close();
     }
 
     @Override
@@ -42,9 +38,6 @@ public class SignUp extends AppCompatActivity{
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup);
-
-        BBDD gestorBBDD = new BBDD(this, "SpliP", null, 1);
-        bbdd = gestorBBDD.getWritableDatabase();
 
         Button bSignUp = findViewById(R.id.bSignUp);
 

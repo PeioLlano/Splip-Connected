@@ -30,8 +30,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
-import com.example.primerproyecto.BBDD.BBDD;
 import com.example.primerproyecto.Dialogs.AddPersonDialog;
 import com.example.primerproyecto.ListAdapters.PersonaAdapter;
 import com.example.primerproyecto.Clases.Gasto;
@@ -39,7 +43,15 @@ import com.example.primerproyecto.Clases.Grupo;
 import com.example.primerproyecto.Clases.Pago;
 import com.example.primerproyecto.Clases.Persona;
 import com.example.primerproyecto.R;
+import com.example.primerproyecto.Workers.DeleteWorker;
+import com.example.primerproyecto.Workers.InsertWorker;
+import com.example.primerproyecto.Workers.SelectWorker;
+import com.example.primerproyecto.Workers.UpdateWorker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -51,7 +63,6 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
     private PersonaAdapter pAdapter;
     Grupo grupo;
     ArrayList<String> posiblesPersonasNombre;
-    SQLiteDatabase bbdd;
     LinearLayout lVacia;
     ListView lPersonas;
     String username;
@@ -59,7 +70,6 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        bbdd.close();
     }
 
     @Override
@@ -80,60 +90,121 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
         TextView tGrupo = (TextView) findViewById(R.id.tGrupo);
         tGrupo.setText(grupo.getTitulo());
 
-        //Abrimos la conexion con la base de datos
-        BBDD gestorBBDD = new BBDD(this, "SpliP", null, 1);
-        bbdd = gestorBBDD.getWritableDatabase();
-
         //Pedimos todos los GASTOS que tenga el usuario y grupo que hemos recibido
-        Cursor c = bbdd.rawQuery("SELECT * FROM Gastos WHERE Grupo = ? AND Usuario = ?", new String[]{grupo.getTitulo(), username});
+        final JSONArray[] jsonArray = {new JSONArray()};
 
-        //Por cada registro añadiremos la informacion en la lista de gastos
-        if (c.moveToFirst()){
-            do{
-                Integer Codigo = c.getInt(0);
-                String Persona = c.getString(3);
-                String Titulo = c.getString(4);
-                Float Cantidad = c.getFloat(5);
+        Data data = new Data.Builder()
+                .putString("tabla", "Gastos")
+                .putString("condicion", "Grupo='"+grupo.getTitulo()+"' AND Usuario='"+username+"'")
+                .build();
 
-                Date Fecha;
-                try{
-                    Fecha = new Date(c.getString(6));
-                }
-                catch (Exception e){
-                    Fecha = new Date();
-                }
+        Constraints constr = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
 
-                if(!grupo.gastoMetido(Codigo)){
-                    grupo.addGasto(new Gasto(Codigo, Titulo, Cantidad, getPersonaByName(Persona), Fecha), getPersonaByName(Persona));
-                }
-            }while(c.moveToNext());
-        }
+        OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(SelectWorker.class)
+                .setConstraints(constr)
+                .setInputData(data)
+                .build();
 
-        //Pedimos todos los pagos que tenga el usuario y grupo que hemos recibido
-        c = bbdd.rawQuery("SELECT * FROM Pagos WHERE Grupo = ? AND Usuario = ?", new String[]{grupo.getTitulo(), username});
+        WorkManager workManager = WorkManager.getInstance(this);
+        workManager.enqueue(req);
 
-        //Por cada registro añadiremos la informacion en la lista de pagos
-        if (c.moveToFirst()){
-            do{
-                Integer Codigo = c.getInt(0);
-                String PersonaA = c.getString(3);
-                String PersonaD = c.getString(4);
-                Float Cantidad = c.getFloat(5);
+        workManager.getWorkInfoByIdLiveData(req.getId())
+                .observe(this, status -> {
+                    if (status != null && status.getState().isFinished()) {
+                        String resultados = status.getOutputData().getString("resultados");
+                        if (resultados.equals("null") || resultados.equals("")) resultados = null;
+                        if(resultados != null) {
+                            try {
+                                jsonArray[0] = new JSONArray(resultados);
 
-                Date Fecha;
-                try{
-                    Fecha = new Date(c.getString(6));
-                }
-                catch (Exception e){
-                    Fecha = new Date();
-                }
+                                for (int i = 0; i < jsonArray[0].length(); i++) {
+                                    JSONObject obj = jsonArray[0].getJSONObject(i);
+                                    Integer Codigo = obj.getInt("Codigo");
+                                    String Persona = obj.getString("Persona");
+                                    String Titulo = obj.getString("Titulo");
+                                    Float Cantidad = (float) obj.getDouble("Cantidad");
 
-                if(!grupo.pagoMetido(Codigo)) {
-                    grupo.addPago(new Pago(Codigo, Cantidad, getPersonaByName(PersonaA), getPersonaByName(PersonaD), Fecha), getPersonaByName(PersonaA));
-                }
+                                    Date Fecha;
+                                    try {
+                                        Fecha = new Date(obj.getString("Fecha"));
+                                    } catch (Exception e) {
+                                        Fecha = new Date();
+                                    }
 
-            }while(c.moveToNext());
-        }
+                                    if (!grupo.gastoMetido(Codigo)) {
+                                        grupo.addGasto(new Gasto(Codigo, Titulo, Cantidad, getPersonaByName(Persona), Fecha), getPersonaByName(Persona));
+                                    }
+
+                                    pAdapter.notifyDataSetChanged();
+
+                                }
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+                });
+        WorkManager.getInstance(this).enqueue(req);
+
+
+        jsonArray[0] = new JSONArray();
+
+        data = new Data.Builder()
+                .putString("tabla", "Pagos")
+                .putString("condicion", "Grupo='"+grupo.getTitulo()+"' AND Usuario='"+username+"'")
+                .build();
+
+        constr = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+
+        req = new OneTimeWorkRequest.Builder(SelectWorker.class)
+                .setConstraints(constr)
+                .setInputData(data)
+                .build();
+
+        workManager = WorkManager.getInstance(this);
+        workManager.enqueue(req);
+
+        workManager.getWorkInfoByIdLiveData(req.getId())
+                .observe(this, status -> {
+                    if (status != null && status.getState().isFinished()) {
+                        String resultados = status.getOutputData().getString("resultados");
+                        if (resultados.equals("null") || resultados.equals("")) resultados = null;
+                        if(resultados != null) {
+                            try {
+                                jsonArray[0] = new JSONArray(resultados);
+
+                                for (int i = 0; i < jsonArray[0].length(); i++) {
+                                    JSONObject obj = jsonArray[0].getJSONObject(i);
+                                    Integer Codigo = obj.getInt("Codigo");
+                                    String PersonaA = obj.getString("PersonaAutora");
+                                    String PersonaD = obj.getString("PersonaDestinataria");
+                                    Float Cantidad = (float) obj.getDouble("Cantidad");
+
+                                    Date Fecha;
+                                    try {
+                                        Fecha = new Date(obj.getString("Fecha"));
+                                    } catch (Exception e) {
+                                        Fecha = new Date();
+                                    }
+
+                                    if(!grupo.pagoMetido(Codigo)) {
+                                        grupo.addPago(new Pago(Codigo, Cantidad, getPersonaByName(PersonaA), getPersonaByName(PersonaD), Fecha), getPersonaByName(PersonaA));
+                                    }
+
+                                    pAdapter.notifyDataSetChanged();
+
+                                }
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+                });
+        WorkManager.getInstance(this).enqueue(req);
 
         //Actualizar los balances antes de mostarlos
         grupo.actualizarBalances();
@@ -158,13 +229,40 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                             if (!nuevoNombre.equals("no cambio")) {
                                 Persona personaCambio = (Persona) result.getData().getSerializableExtra("persona");
 
-                                ContentValues contentValues = new ContentValues();
-                                contentValues.put("Nombre", nuevoNombre);
+                                Data data = new Data.Builder()
+                                        .putString("tabla", "Personas")
+                                        .putString("condicion", "Grupo = '"+grupo.getTitulo()+"' AND Nombre = '"+personaCambio.getNombre()+"' AND Usuario = '"+username+"'")
+                                        .putStringArray("keys", new String[]{"Nombre"})
+                                        .putStringArray("values", new String[]{nuevoNombre})
+                                        .build();
 
-                                bbdd.update("Personas", contentValues, "Grupo = ? AND Nombre = ? AND Usuario = ?", new String[]{grupo.getTitulo(),personaCambio.getNombre(), username});
+                                Constraints constr = new Constraints.Builder()
+                                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                                        .build();
 
-                                grupo.getPersonaByName(personaCambio.getNombre()).setNombre(nuevoNombre);
-                                lPersonas.setAdapter(pAdapter);
+                                OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(UpdateWorker.class)
+                                        .setConstraints(constr)
+                                        .setInputData(data)
+                                        .build();
+
+                                WorkManager workManager = WorkManager.getInstance(MainGrupo.this);
+                                workManager.enqueue(req);
+
+                                workManager.getWorkInfoByIdLiveData(req.getId())
+                                        .observe(MainGrupo.this, status -> {
+                                            if (status != null && status.getState().isFinished()) {
+                                                Boolean resultados = status.getOutputData().getBoolean("resultado", false);
+                                                if(resultados) {
+                                                    grupo.getPersonaByName(personaCambio.getNombre()).setNombre(nuevoNombre);
+                                                    pAdapter.notifyDataSetChanged();
+                                                }
+                                                else {
+                                                    Toast aviso = Toast.makeText(getApplicationContext(), getResources().getString(R.string.grupo_existe), Toast.LENGTH_SHORT);
+                                                    aviso.show();
+                                                }
+                                            }});
+
+
                             }
                         }
                     }
@@ -198,14 +296,38 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //Borramos la persona de todos los lados y se lo notificamos al adaptador
-                        bbdd.delete("Personas", "Grupo = ? AND Nombre = ? AND Usuario = ?", new String[]{grupo.getTitulo(), grupo.getPersonas().get(posAborrar[0]).getNombre(), username});
-                        grupo.retirarGastosyPagos(grupo.getPersonas().get((int)posAborrar[0]));
-                        grupo.getPersonas().remove(((int)posAborrar[0]));
-                        posiblesPersonasNombre.remove(((int)posAborrar[0]));
-                        grupo.actualizarBalances();
-                        pAdapter.notifyDataSetChanged();
-                        actualizarVacioLleno(grupo.getPersonas());
-                        posAborrar[0] = -1;
+
+                        Data data = new Data.Builder()
+                                .putString("tabla", "Personas")
+                                .putString("condicion", "Grupo = '"+grupo.getTitulo()+"' AND Nombre = '"+grupo.getPersonas().get(posAborrar[0]).getNombre()+"' AND Usuario = '"+username+"'")
+                                .build();
+
+                        Constraints constr = new Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .build();
+
+                        OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(DeleteWorker.class)
+                                .setConstraints(constr)
+                                .setInputData(data)
+                                .build();
+
+                        WorkManager workManager = WorkManager.getInstance(MainGrupo.this);
+                        workManager.enqueue(req);
+
+                        workManager.getWorkInfoByIdLiveData(req.getId())
+                                .observe(MainGrupo.this, status -> {
+                                    if (status != null && status.getState().isFinished()) {
+                                        String resultados = status.getOutputData().getString("resultados");
+                                        if(resultados.equals("Ok")) {
+                                            grupo.retirarGastosyPagos(grupo.getPersonas().get((int)posAborrar[0]));
+                                            grupo.getPersonas().remove(((int)posAborrar[0]));
+                                            posiblesPersonasNombre.remove(((int)posAborrar[0]));
+                                            grupo.actualizarBalances();
+                                            pAdapter.notifyDataSetChanged();
+                                            actualizarVacioLleno(grupo.getPersonas());
+                                            posAborrar[0] = -1;
+                                        }
+                                    }});
                     }
                 });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -272,22 +394,40 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                             String cantidad = result.getData().getStringExtra("cantidad");
                             String autor = result.getData().getStringExtra("autor");
 
-                            ContentValues contentValues = new ContentValues();
-                            contentValues.put("Grupo", grupo.getTitulo());
-                            contentValues.put("Persona", autor);
-                            contentValues.put("Titulo", nombre);
-                            contentValues.put("Cantidad", cantidad);
-                            contentValues.put("Usuario", username);
-
                             Date date = new Date();
+                            SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-                            contentValues.put("Fecha", date.toString());
+                            Data data = new Data.Builder()
+                                    .putString("tabla", "Gastos")
+                                    .putStringArray("keys", new String[]{"Grupo","Persona", "Titulo", "Cantidad", "Usuario", "Fecha"})
+                                    .putStringArray("values", new String[]{grupo.getTitulo(),autor, nombre, cantidad, username,  f.format(date)})
+                                    .build();
 
-                            long row = bbdd.insert("Gastos", null, contentValues);
+                            Constraints constr = new Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                                    .build();
 
-                            addGasto(new Gasto((int) row, nombre, Float.parseFloat(cantidad), getPersonaByName(autor), date), getPersonaByName(autor));
+                            OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(InsertWorker.class)
+                                    .setConstraints(constr)
+                                    .setInputData(data)
+                                    .build();
 
-                            lPersonas.setAdapter(pAdapter);
+                            WorkManager workManager = WorkManager.getInstance(MainGrupo.this);
+                            workManager.enqueue(req);
+
+                            workManager.getWorkInfoByIdLiveData(req.getId())
+                                    .observe(MainGrupo.this, status -> {
+                                        if (status != null && status.getState().isFinished()) {
+                                            Boolean resultados = status.getOutputData().getBoolean("resultado", false);
+                                            if(resultados) {
+                                                addGasto(new Gasto(status.getOutputData().getInt("id", -1), nombre, Float.parseFloat(cantidad), getPersonaByName(autor), date), getPersonaByName(autor));
+                                                pAdapter.notifyDataSetChanged();
+                                            }
+                                            else {
+                                                Toast aviso = Toast.makeText(getApplicationContext(), getResources().getString(R.string.grupo_existe), Toast.LENGTH_SHORT);
+                                                aviso.show();
+                                            }
+                                        }});
 
                             avisoGasto.show();
                         }
@@ -327,23 +467,40 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                             String autor = result.getData().getStringExtra("autor");
                             String destinatario = result.getData().getStringExtra("destinatario");
 
-                            ContentValues contentValues = new ContentValues();
-                            contentValues.put("Grupo", grupo.getTitulo());
-                            contentValues.put("PersonaAutora", autor);
-                            contentValues.put("PersonaDestinataria", destinatario);
-                            contentValues.put("Cantidad", cantidad);
-                            contentValues.put("Usuario", username);
-
-                            DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD");
                             Date date = new Date();
+                            SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-                            contentValues.put("Fecha", dateFormat.format(date));
+                            Data data = new Data.Builder()
+                                    .putString("tabla", "Pagos")
+                                    .putStringArray("keys", new String[]{"Grupo","PersonaAutora", "PersonaDestinataria", "Cantidad", "Usuario", "Fecha"})
+                                    .putStringArray("values", new String[]{grupo.getTitulo(),autor, destinatario, cantidad, username,  f.format(date)})
+                                    .build();
 
-                            long row = bbdd.insert("Pagos", null, contentValues);
+                            Constraints constr = new Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                                    .build();
 
-                            addPago(new Pago((int) row, Float.parseFloat(cantidad), getPersonaByName(autor), getPersonaByName(destinatario), date), getPersonaByName(autor));
+                            OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(InsertWorker.class)
+                                    .setConstraints(constr)
+                                    .setInputData(data)
+                                    .build();
 
-                            lPersonas.setAdapter(pAdapter);
+                            WorkManager workManager = WorkManager.getInstance(MainGrupo.this);
+                            workManager.enqueue(req);
+
+                            workManager.getWorkInfoByIdLiveData(req.getId())
+                                    .observe(MainGrupo.this, status -> {
+                                        if (status != null && status.getState().isFinished()) {
+                                            Boolean resultados = status.getOutputData().getBoolean("resultado", false);
+                                            if(resultados) {
+                                                addPago(new Pago((int) status.getOutputData().getInt("id", -1), Float.parseFloat(cantidad), getPersonaByName(autor), getPersonaByName(destinatario), date), getPersonaByName(autor));
+                                                pAdapter.notifyDataSetChanged();
+                                            }
+                                            else {
+                                                Toast aviso = Toast.makeText(getApplicationContext(), getResources().getString(R.string.grupo_existe), Toast.LENGTH_SHORT);
+                                                aviso.show();
+                                            }
+                                        }});
 
                             avisoPago.show();
                         }
@@ -382,13 +539,34 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                             for (Integer i: borrados) {
                                 for (Pago g: grupo.getPagos()) {
                                     if (g.getCodigo() == i){
-                                        grupo.getPagos().remove(g);
-                                        grupo.actualizarBalances();
-
                                         //Borramos el gasto.
-                                        bbdd.delete("Pagos","Codigo = ?", new String[]{String.valueOf(i)});
+                                        Data data = new Data.Builder()
+                                                .putString("tabla", "Pagos")
+                                                .putString("condicion", "Codigo = "+String.valueOf(i)+"")
+                                                .build();
 
-                                        pAdapter.notifyDataSetChanged();
+                                        Constraints constr = new Constraints.Builder()
+                                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                                .build();
+
+                                        OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(DeleteWorker.class)
+                                                .setConstraints(constr)
+                                                .setInputData(data)
+                                                .build();
+
+                                        WorkManager workManager = WorkManager.getInstance(MainGrupo.this);
+                                        workManager.enqueue(req);
+
+                                        workManager.getWorkInfoByIdLiveData(req.getId())
+                                                .observe(MainGrupo.this, status -> {
+                                                    if (status != null && status.getState().isFinished()) {
+                                                        String resultados = status.getOutputData().getString("resultados");
+                                                        if(resultados.equals("Ok")) {
+                                                            grupo.getPagos().remove(g);
+                                                            grupo.actualizarBalances();
+                                                            pAdapter.notifyDataSetChanged();
+                                                        }
+                                                    }});
                                     }
                                 }
                             }
@@ -424,13 +602,34 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                         for (Integer i: borrados) {
                             for (Gasto g: grupo.getGastos()) {
                                 if (g.getCodigo() == i){
-                                    grupo.getGastos().remove(g);
-                                    grupo.actualizarBalances();
-
                                     //Borramos el gasto.
-                                    bbdd.delete("Gastos","Codigo = ?", new String[]{String.valueOf(i)});
+                                    Data data = new Data.Builder()
+                                            .putString("tabla", "Gastos")
+                                            .putString("condicion", "Codigo = "+String.valueOf(i)+"")
+                                            .build();
 
-                                    pAdapter.notifyDataSetChanged();
+                                    Constraints constr = new Constraints.Builder()
+                                            .setRequiredNetworkType(NetworkType.CONNECTED)
+                                            .build();
+
+                                    OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(DeleteWorker.class)
+                                            .setConstraints(constr)
+                                            .setInputData(data)
+                                            .build();
+
+                                    WorkManager workManager = WorkManager.getInstance(MainGrupo.this);
+                                    workManager.enqueue(req);
+
+                                    workManager.getWorkInfoByIdLiveData(req.getId())
+                                            .observe(MainGrupo.this, status -> {
+                                                if (status != null && status.getState().isFinished()) {
+                                                    String resultados = status.getOutputData().getString("resultados");
+                                                    if(resultados.equals("Ok")) {
+                                                        grupo.getGastos().remove(g);
+                                                        grupo.actualizarBalances();
+                                                        pAdapter.notifyDataSetChanged();
+                                                    }
+                                                }});
                                 }
                             }
                         }
@@ -643,38 +842,46 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                             ArrayList<Pago> pagosSeleccionados = (ArrayList<Pago>) result.getData().getSerializableExtra("pagosSeleccionados");
 
                             for (Pago pago: pagosSeleccionados) {
-                                ContentValues contentValues = new ContentValues();
-                                contentValues.put("Grupo", grupo.getTitulo());
                                 String autor = pago.getAutor().getNombre();
-                                contentValues.put("PersonaAutora", autor);
                                 String destinatario = pago.getDestinatario().getNombre();
-                                contentValues.put("PersonaDestinataria", destinatario);
                                 String cantidad = pago.getCantidad().toString();
-                                contentValues.put("Cantidad", cantidad);
-                                contentValues.put("Usuario", username);
 
-
-                                DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD");
                                 Date date = new Date();
+                                SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-                                contentValues.put("Fecha", dateFormat.format(date));
+                                Data data = new Data.Builder()
+                                        .putString("tabla", "Pagos")
+                                        .putStringArray("keys", new String[]{"Grupo","PersonaAutora", "PersonaDestinataria", "Cantidad", "Usuario", "Fecha"})
+                                        .putStringArray("values", new String[]{grupo.getTitulo(),autor, destinatario, cantidad, username,  f.format(date)})
+                                        .build();
 
-                                long row = bbdd.insert("Pagos", null, contentValues);
+                                Constraints constr = new Constraints.Builder()
+                                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                                        .build();
 
-                                Cursor c = bbdd.rawQuery("SELECT rowid, codigo FROM Pagos WHERE Grupo = ? AND PersonaAutora = ? AND PersonaDestinataria = ? AND Usuario = ?", new String[]{grupo.getTitulo(), autor, destinatario, username});
-                                Integer codigo = null;
+                                OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(InsertWorker.class)
+                                        .setConstraints(constr)
+                                        .setInputData(data)
+                                        .build();
 
-                                if (c.moveToFirst()){
-                                    do{
-                                        if (c.getInt(0) == row){
-                                            codigo = c.getInt(1);
-                                        }
-                                    }while(c.moveToNext());
-                                }
+                                WorkManager workManager = WorkManager.getInstance(MainGrupo.this);
+                                workManager.enqueue(req);
 
-                                addPago(new Pago(codigo, Float.parseFloat(cantidad), getPersonaByName(autor), getPersonaByName(destinatario), date), getPersonaByName(autor));
+                                workManager.getWorkInfoByIdLiveData(req.getId())
+                                        .observe(MainGrupo.this, status -> {
+                                            if (status != null && status.getState().isFinished()) {
+                                                Boolean resultados = status.getOutputData().getBoolean("resultado", false);
+                                                if(resultados) {
+                                                    addPago(new Pago((int) status.getOutputData().getInt("id", -1), Float.parseFloat(cantidad), getPersonaByName(autor), getPersonaByName(destinatario), date), getPersonaByName(autor));
+                                                    pAdapter.notifyDataSetChanged();
+                                                }
+                                                else {
+                                                    Toast aviso = Toast.makeText(getApplicationContext(), getResources().getString(R.string.grupo_existe), Toast.LENGTH_SHORT);
+                                                    aviso.show();
+                                                }
+                                            }});
                             }
-                            lPersonas.setAdapter(pAdapter);
+                            pAdapter.notifyDataSetChanged();
 
                             //PendingIntent intentEnNot = PendingIntent.getActivity(getApplicationContext(), PendingIntent.FLAG_UPDATE_CURRENT, i, PendingIntent.FLAG_IMMUTABLE);
 
@@ -752,19 +959,40 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
     public void añadirPersona(String Username) {
 
         if (!grupo.tienePersona(Username)) {
-            grupo.getPersonas().add(new Persona(Username, (float) 0, 0, 0));
-            posiblesPersonasNombre.add(Username);
-            grupo.actualizarBalances();
-            pAdapter.notifyDataSetChanged();
+            Data data = new Data.Builder()
+                    .putString("tabla", "Personas")
+                    .putStringArray("keys", new String[]{"Grupo","Nombre", "Usuario"})
+                    .putStringArray("values", new String[]{grupo.getTitulo(),Username, username})
+                    .build();
 
-            ContentValues contentValues = new ContentValues();
-            contentValues.put("Grupo", grupo.getTitulo());
-            contentValues.put("Nombre", Username);
-            contentValues.put("Usuario", username);
+            Constraints constr = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
 
-            bbdd.insertOrThrow("Personas", null, contentValues);
+            OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(InsertWorker.class)
+                    .setConstraints(constr)
+                    .setInputData(data)
+                    .build();
 
-            actualizarVacioLleno(grupo.getPersonas());
+            WorkManager workManager = WorkManager.getInstance(this);
+            workManager.enqueue(req);
+
+            workManager.getWorkInfoByIdLiveData(req.getId())
+                    .observe(this, status -> {
+                        if (status != null && status.getState().isFinished()) {
+                            Boolean resultados = status.getOutputData().getBoolean("resultado", false);
+                            if(resultados) {
+                                grupo.getPersonas().add(new Persona(Username, (float) 0, 0, 0));
+                                posiblesPersonasNombre.add(Username);
+                                grupo.actualizarBalances();
+                                pAdapter.notifyDataSetChanged();
+                                actualizarVacioLleno(grupo.getPersonas());
+                            }
+                            else {
+                                Toast aviso = Toast.makeText(getApplicationContext(), getResources().getString(R.string.persona_existe), Toast.LENGTH_SHORT);
+                                aviso.show();
+                            }
+                        }});
         }
         else {
             Toast aviso = Toast.makeText(getApplicationContext(), getResources().getString(R.string.persona_existe), Toast.LENGTH_SHORT);
