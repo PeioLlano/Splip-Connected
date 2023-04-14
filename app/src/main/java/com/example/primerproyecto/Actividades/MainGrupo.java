@@ -1,5 +1,6 @@
 package com.example.primerproyecto.Actividades;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -8,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
@@ -29,7 +31,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.NetworkType;
@@ -922,34 +926,74 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
         bImport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Obtener un ContentResolver
-                ContentResolver resolver = getContentResolver();
-
-                // Definir las columnas que se quieren obtener
-                String[] columnas = new String[] {
-                        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                };
-
-                // Definir la cláusula WHERE para filtrar los contactos por nombre
-                String filtro = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " LIKE 'SP_%'";
-
-                // Realizar una consulta a los contactos
-                Cursor cursor = resolver.query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        columnas,
-                        filtro,
-                        null,
-                        null
-                );
-
-                // Recorrer los resultados y obtener los nombres y números de teléfono
-                while (cursor.moveToNext()) {
-                    @SuppressLint("Range") String nombre = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                    Log.d("Contactos", "Nombre: " + nombre);
+                if (ContextCompat.checkSelfPermission(MainGrupo.this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MainGrupo.this, new String[]{Manifest.permission.READ_CONTACTS}, 7);
                 }
 
-// Cerrar el cursor
-                cursor.close();
+                if (ContextCompat.checkSelfPermission(MainGrupo.this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+
+                    Log.d("Prueba", "entro");
+
+                    // Obtener un ContentResolver
+                    ContentResolver resolver = getContentResolver();
+
+                    // Definir las columnas que se quieren obtener
+                    String[] columnas = new String[]{
+                            ContactsContract.Contacts.DISPLAY_NAME,
+                    };
+
+                    // Definir la cláusula WHERE para filtrar los contactos por nombre
+                    String filtro = ContactsContract.Contacts.DISPLAY_NAME + " LIKE 'SP_%'";
+
+                    // Realizar una consulta a los contactos
+                    Cursor cursor = resolver.query(
+                            ContactsContract.Contacts.CONTENT_URI,
+                            columnas,
+                            filtro,
+                            null,
+                            null
+                    );
+
+                    // Recorrer los resultados y obtener los nombres y números de teléfono
+                    while (cursor.moveToNext()) {
+                        @SuppressLint("Range") String nombre = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)).split("SP_")[1];
+                        Data data = new Data.Builder()
+                                .putString("tabla", "Personas")
+                                .putStringArray("keys", new String[]{"Grupo","Nombre", "Usuario"})
+                                .putStringArray("values", new String[]{grupo.getTitulo(),nombre, username})
+                                .build();
+
+                        Constraints constr = new Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .build();
+
+                        OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(InsertWorker.class)
+                                .setConstraints(constr)
+                                .setInputData(data)
+                                .build();
+
+                        WorkManager workManager = WorkManager.getInstance(MainGrupo.this);
+                        workManager.enqueue(req);
+
+                        workManager.getWorkInfoByIdLiveData(req.getId())
+                                .observe(MainGrupo.this, status -> {
+                                    if (status != null && status.getState().isFinished()) {
+                                        Boolean resultados = status.getOutputData().getBoolean("resultado", false);
+                                        if(resultados) {
+                                            grupo.getPersonas().add(new Persona(nombre, (float) 0, 0, 0));
+                                            posiblesPersonasNombre.add(username);
+                                            grupo.actualizarBalances();
+                                            pAdapter.notifyDataSetChanged();
+                                            actualizarVacioLleno(grupo.getPersonas());
+                                        }
+                                    }});
+
+                        Log.d("Contactos", "Nombre: " + nombre);
+                    }
+
+                    // Cerrar el cursor
+                    cursor.close();
+                }
             }
         });
     }

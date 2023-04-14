@@ -7,6 +7,23 @@
     android:layout_height="match_parent"
     tools:context=".Actividades.MainGrupo">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/bImport"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:clickable="true"
+        android:visibility="visible"
+        app:backgroundTint="@android:color/holo_orange_dark"
+        app:fabCustomSize="40dp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toBottomOf="@+id/tGrupo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tGrupo"
+        app:maxImageSize="22dp"
+        app:srcCompat="@drawable/download"
+        tools:ignore="SpeakableTextPresentCheck" />
+
     <TextView
         android:id="@+id/tExpAddPersona"
         android:layout_width="70dp"
