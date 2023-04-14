@@ -46,12 +46,9 @@ import java.util.Locale;
 
 public class Login extends AppCompatActivity implements IdiomaDialog.ListenerdelDialogoIdioma, EstiloDialog.ListenerdelDialogoEstilo{
 
-    SQLiteDatabase bbdd;
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        bbdd.close();
     }
 
     @Override
@@ -63,10 +60,6 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
         setContentView(R.layout.login);
 
         scheduleAlarm();
-
-        //Abrimos la conexion con la base de datos
-        BBDD gestorBBDD = new BBDD(this, "SpliP", null, 1);
-        bbdd = gestorBBDD.getWritableDatabase();
 
         //Pedimos los permisos para notificaciones si es que no los tenemos
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)!=

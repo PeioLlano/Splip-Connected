@@ -13,13 +13,11 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 
-public class SelectWorker extends Worker {
-    public SelectWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+public class DeleteWorker extends Worker {
+    public DeleteWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
 
@@ -31,10 +29,10 @@ public class SelectWorker extends Worker {
         String condicion = getInputData().getString("condicion");
 
         try {
-            Log.d("statusCode", String.valueOf("http://ec2-54-93-62-124.eu-central-1.compute.amazonaws.com/pllano002/WEB/ReadData.php"));
+            Log.d("statusCode", String.valueOf("http://ec2-54-93-62-124.eu-central-1.compute.amazonaws.com/pllano002/WEB/DeleteData.php"));
 
             HttpURLConnection urlConnection = null;
-            URL url = new URL("http://ec2-54-93-62-124.eu-central-1.compute.amazonaws.com/pllano002/WEB/ReadData.php");
+            URL url = new URL("http://ec2-54-93-62-124.eu-central-1.compute.amazonaws.com/pllano002/WEB/DeleteData.php");
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(5000);
             urlConnection.setReadTimeout(5000);

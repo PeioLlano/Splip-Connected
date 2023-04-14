@@ -21,8 +21,15 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import com.example.primerproyecto.BBDD.BBDD;
+import com.example.primerproyecto.BBDD.BbDdRemota;
 import com.example.primerproyecto.Dialogs.AddGroupDialog;
 import com.example.primerproyecto.Dialogs.EstiloDialog;
 import com.example.primerproyecto.Dialogs.IdiomaDialog;
@@ -32,24 +39,32 @@ import com.example.primerproyecto.Clases.Grupo;
 import com.example.primerproyecto.Clases.Pago;
 import com.example.primerproyecto.Clases.Persona;
 import com.example.primerproyecto.R;
+import com.example.primerproyecto.Workers.DeleteWorker;
+import com.example.primerproyecto.Workers.InsertWorker;
+import com.example.primerproyecto.Workers.SelectWorker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 
 public class ListGrupos extends AppCompatActivity implements IdiomaDialog.ListenerdelDialogoIdioma, EstiloDialog.ListenerdelDialogoEstilo, AddGroupDialog.AddGroupDialogListener {
 
     ArrayList<Grupo> arraydedatos= new ArrayList<>();
     private GroupAdapter pAdapter;
     String username;
-    SQLiteDatabase bbdd;
     ListView lGrupos;
     LinearLayout lVacia;
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        bbdd.close();
     }
 
     @Override
@@ -57,7 +72,14 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
         super.onRestart();
 
         for (Grupo gru: arraydedatos) {
-            Cursor c2 = bbdd.rawQuery("SELECT * FROM Personas WHERE Grupo = ? AND Usuario = ?", new String[]{gru.getTitulo(), username});
+
+            /*Cursor c2 = bbddr.selectTabla(
+                    this,
+                    "Personas" ,
+                    true,
+                    new String[]{"Grupo", "Usuarios"},
+                    new String[]{gru.getTitulo(), username});
+                    //bbdd.rawQuery("SELECT * FROM Personas WHERE Grupo = ? AND Usuario = ?", new String[]{gru.getTitulo(), username});
 
             if (c2.moveToFirst()) {
                 do {
@@ -65,7 +87,51 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
 
                     if (!gru.tieneNombre(Nombre)) gru.getPersonas().add(new Persona(Nombre, 0f, 0, 0));
                 } while (c2.moveToNext());
-            }
+            }*/
+
+            final JSONArray[] jsonArray2 = {new JSONArray()};
+
+            Data data2 = new Data.Builder()
+                    .putString("tabla", "Personas")
+                    .putString("condicion", "Usuario='"+username+"' AND Grupo='" + gru.getTitulo() + "'")
+                    .build();
+
+            Constraints constr2 = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
+
+            OneTimeWorkRequest req2 = new OneTimeWorkRequest.Builder(SelectWorker.class)
+                    .setConstraints(constr2)
+                    .setInputData(data2)
+                    .build();
+
+            WorkManager workManager2 = WorkManager.getInstance(this);
+            workManager2.enqueue(req2);
+
+            workManager2.getWorkInfoByIdLiveData(req2.getId())
+                    .observe(this, status2 -> {
+                        if (status2 != null && status2.getState().isFinished()) {
+                            String resultados2 = status2.getOutputData().getString("resultados");
+                            if (resultados2 == "null" || resultados2 == "") resultados2 = null;
+                            if(resultados2 != null) {
+                                try {
+                                    jsonArray2[0] = new JSONArray(resultados2);
+
+                                    ArrayList<Persona> personasGrupo = new ArrayList<>();
+
+                                    for (int j = 0; j < jsonArray2[0].length(); j++) {
+                                        JSONObject obj2 = jsonArray2[0].getJSONObject(j);
+
+                                        String Nombre = obj2.getString("Nombre");
+
+                                        if (!gru.tieneNombre(Nombre)) gru.getPersonas().add(new Persona(Nombre, 0f, 0, 0));
+                                    }
+
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        }});
         }
 
 
@@ -83,96 +149,108 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
             username = extras.getString("usuario");
         }
 
-        //Abrimos la conexion con la base de datos
-        BBDD gestorBBDD = new BBDD(this, "SpliP", null, 1);
-        bbdd = gestorBBDD.getWritableDatabase();
+        final JSONArray[] jsonArray = {new JSONArray()};
 
-        //Pedimos todos los Grupos que tenga el usuario que hemos recibido
-        Cursor c = bbdd.rawQuery("SELECT * FROM Grupos WHERE Usuario = ?", new String[]{username});
+        Data data = new Data.Builder()
+                .putString("tabla", "Grupos")
+                .putString("condicion", "Usuario='"+username+"'")
+                .build();
 
-        //Por cada grupo buscaremos todas las personas y añadiremos ambos objetos a sus repectivas listas
-        if (c.moveToFirst()){
-            do{
-                String Titulo = c.getString(1);
-                String Divisa = c.getString(2);
+        Constraints constr = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
 
-                Cursor c2 = bbdd.rawQuery("SELECT * FROM Personas WHERE Grupo = ? AND Usuario = ?", new String[]{Titulo, username});
-                ArrayList<Persona> personasGrupo = new ArrayList<>();
+        OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(SelectWorker.class)
+                .setConstraints(constr)
+                .setInputData(data)
+                .build();
 
-                if (c2.moveToFirst()) {
-                    do {
-                        String Nombre = c2.getString(2);
+        WorkManager workManager = WorkManager.getInstance(this);
+        workManager.enqueue(req);
 
-                        personasGrupo.add(new Persona(Nombre, 0f, 0, 0));
-                    } while (c2.moveToNext());
-                }
+        workManager.getWorkInfoByIdLiveData(req.getId())
+                .observe(this, status -> {
+                    if (status != null && status.getState().isFinished()) {
+                        String resultados = status.getOutputData().getString("resultados");
+                        if (resultados == "null" || resultados == "") resultados = null;
+                        if(resultados != null) {
+                            try {
+                                jsonArray[0] = new JSONArray(resultados);
 
-                arraydedatos.add(new Grupo(Titulo, Divisa, personasGrupo, new ArrayList<Gasto>(), new ArrayList<Pago>()));
+                                for (int i = 0; i < jsonArray[0].length(); i++) {
+                                    JSONObject obj = null;
+                                        obj = jsonArray[0].getJSONObject(i);
 
-            }while(c.moveToNext());
-        }
+                                        String Titulo = obj.getString("Titulo");
+                                        String Divisa = obj.getString("Divisa");
 
+                                        final JSONArray[] jsonArray2 = {new JSONArray()};
 
-        //Inicializamos la lisat de grupos
-        lGrupos = (ListView) findViewById(R.id.lPersonas);
-        lVacia = findViewById(R.id.lVacia);
+                                        Data data2 = new Data.Builder()
+                                                .putString("tabla", "Personas")
+                                                .putString("condicion", "Usuario='"+username+"' AND Grupo='" + Titulo + "'")
+                                                .build();
 
-        pAdapter = new GroupAdapter(getApplicationContext(), arraydedatos);
+                                        Constraints constr2 = new Constraints.Builder()
+                                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                                .build();
 
-        lGrupos.setAdapter(pAdapter);
-        //Si clicamos un grupo nos lleve a MainGrupo
-        lGrupos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                        OneTimeWorkRequest req2 = new OneTimeWorkRequest.Builder(SelectWorker.class)
+                                                .setConstraints(constr2)
+                                                .setInputData(data2)
+                                                .build();
 
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                Intent intent = new Intent(ListGrupos.this, MainGrupo.class);
-                intent.putExtra("grupo", arraydedatos.get(position));
-                intent.putExtra("username", username);
-                startActivity(intent);
-            }
-        });
+                                        WorkManager workManager2 = WorkManager.getInstance(this);
+                                        workManager2.enqueue(req2);
 
-        ///Gestionar que se ve dependiendo si la lista esta vacia o llena
-        actualizarVacioLleno(arraydedatos);
+                                        workManager2.getWorkInfoByIdLiveData(req2.getId())
+                                                .observe(this, status2 -> {
+                                                    if (status2 != null && status2.getState().isFinished()) {
+                                                        String resultados2 = status2.getOutputData().getString("resultados");
+                                                        if ((resultados2.equals("null")) || (resultados2.equals(""))){
+                                                            resultados2 = null;
+                                                        }
+                                                        if(resultados2 != null) {
+                                                            try {
+                                                                jsonArray2[0] = new JSONArray(resultados2);
 
-        final Integer[] posAborrar = {-1};
+                                                                ArrayList<Persona> personasGrupo = new ArrayList<>();
 
-        //Generar el dialogo que se deberia de ver si pulsamos por un tiempo prolongado un grupo
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
-        builder.setTitle(getString(R.string.delete_group));
-        builder.setPositiveButton(R.string.confirm,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Borramos el grupo de todos los lados y se lo notificamos al adaptador
-                        bbdd.delete("Grupos", "Titulo = ? AND Usuario = ?", new String[]{arraydedatos.get(posAborrar[0]).getTitulo(), username});
-                        arraydedatos.remove(((int)posAborrar[0]));
-                        pAdapter.notifyDataSetChanged();
-                        actualizarVacioLleno(arraydedatos);
-                        posAborrar[0] = -1;
+                                                                for (int j = 0; j < jsonArray2[0].length(); j++) {
+                                                                    JSONObject obj2 = jsonArray2[0].getJSONObject(j);
+
+                                                                    String Nombre = obj2.getString("Nombre");
+
+                                                                    personasGrupo.add(new Persona(Nombre, 0f, 0, 0));
+                                                                }
+
+                                                                arraydedatos.add(new Grupo(Titulo, Divisa, personasGrupo, new ArrayList<Gasto>(), new ArrayList<Pago>()));
+                                                                initList();
+
+                                                            } catch (JSONException e) {
+                                                                throw new RuntimeException(e);
+                                                            }
+                                                        }
+                                                        else {
+                                                            arraydedatos.add(new Grupo(Titulo, Divisa, new ArrayList<>(), new ArrayList<Gasto>(), new ArrayList<Pago>()));
+                                                            //initList();
+                                                        }
+                                                    }});
+                                }
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        else{
+                            initList();
+                        }
                     }
                 });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
 
-        AlertDialog dialogBorrar = builder.create();
+        WorkManager.getInstance(this).enqueue(req);
 
 
-
-        //Si pulsamos por un tiempo prolongado un grupo mostramos el dialogo
-        lGrupos.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-                                           int pos, long id) {
-                posAborrar[0] = pos;
-                dialogBorrar.show();
-                return true;
-            }
-        });
+        //bbdd.rawQuery("SELECT * FROM Grupos WHERE Usuario = ?", new String[]{username});
 
         FloatingActionButton bLanguage = findViewById(R.id.bLanguage);
         //Boton para gestionar el idioma, se muestra el dialogo que es para ello.
@@ -345,6 +423,95 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
         });
     }
 
+    public void initList(){
+        //Inicializamos la lisat de grupos
+        lGrupos = (ListView) findViewById(R.id.lPersonas);
+        lVacia = findViewById(R.id.lVacia);
+
+        pAdapter = new GroupAdapter(getApplicationContext(), arraydedatos);
+
+        lGrupos.setAdapter(pAdapter);
+        //Si clicamos un grupo nos lleve a MainGrupo
+        lGrupos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                Intent intent = new Intent(ListGrupos.this, MainGrupo.class);
+                intent.putExtra("grupo", arraydedatos.get(position));
+                intent.putExtra("username", username);
+                startActivity(intent);
+            }
+        });
+
+        ///Gestionar que se ve dependiendo si la lista esta vacia o llena
+        actualizarVacioLleno(arraydedatos);
+
+        final Integer[] posAborrar = {-1};
+
+        //Generar el dialogo que se deberia de ver si pulsamos por un tiempo prolongado un grupo
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(getString(R.string.delete_group));
+        builder.setPositiveButton(R.string.confirm,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Borramos el grupo de todos los lados y se lo notificamos al adaptador
+                        //bbdd.delete("Grupos", "Titulo = ? AND Usuario = ?", new String[]{arraydedatos.get(posAborrar[0]).getTitulo(), username});
+                        Data data = new Data.Builder()
+                                .putString("tabla", "Grupos")
+                                .putString("condicion", "Titulo = '" + arraydedatos.get(posAborrar[0]).getTitulo() + "' AND Usuario = '" + username + "'")
+                                .build();
+
+                        Constraints constr = new Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .build();
+
+                        OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(DeleteWorker.class)
+                                .setConstraints(constr)
+                                .setInputData(data)
+                                .build();
+
+                        WorkManager workManager = WorkManager.getInstance(ListGrupos.this);
+                        workManager.enqueue(req);
+
+                        workManager.getWorkInfoByIdLiveData(req.getId())
+                                .observe(ListGrupos.this, status -> {
+                                    if (status != null && status.getState().isFinished()) {
+                                        String resultados = status.getOutputData().getString("resultados");
+                                        if(resultados.equals("Ok")) {
+                                            arraydedatos.remove(((int)posAborrar[0]));
+                                            pAdapter.notifyDataSetChanged();
+                                            actualizarVacioLleno(arraydedatos);
+                                            posAborrar[0] = -1;
+                                        }
+                                        else {
+                                            Toast aviso = Toast.makeText(getApplicationContext(), getResources().getString(R.string.grupo_existe), Toast.LENGTH_SHORT);
+                                            aviso.show();
+                                        }
+                                    }});
+                    }
+                });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        AlertDialog dialogBorrar = builder.create();
+
+        //Si pulsamos por un tiempo prolongado un grupo mostramos el dialogo
+        lGrupos.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                                           int pos, long id) {
+                posAborrar[0] = pos;
+                dialogBorrar.show();
+                return true;
+            }
+        });
+    }
+
     //Al tratar de cerrar la app preguntamos si esta seguro mediante dialogo
     @Override
     public void onBackPressed() {
@@ -364,25 +531,40 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
     public void añadirGrupo(String Name, String currency) {
 
         //Hacemos try de insertar el grupo para mostrar un toast en caso de que no se pueda insertar
-        try{
-            ContentValues contentValues = new ContentValues();
-            contentValues.put("Usuario", username);
-            contentValues.put("Titulo", Name);
-            contentValues.put("Divisa", currency);
+        Data data = new Data.Builder()
+                .putString("tabla", "Grupos")
+                .putStringArray("keys", new String[]{"Usuario","Titulo", "Divisa"})
+                .putStringArray("values", new String[]{username,Name, currency})
+                .build();
 
-            bbdd.insertOrThrow("Grupos", null, contentValues);
+        Constraints constr = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
 
-            arraydedatos.add(new Grupo(Name, currency, new ArrayList<Persona>(), new ArrayList<Gasto>(), new ArrayList<Pago>()));
+        OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(InsertWorker.class)
+                .setConstraints(constr)
+                .setInputData(data)
+                .build();
 
-            pAdapter.notifyDataSetChanged();
+        WorkManager workManager = WorkManager.getInstance(this);
+        workManager.enqueue(req);
 
-            actualizarVacioLleno(arraydedatos);
-        }
-        catch (SQLiteConstraintException e) {
-            e.printStackTrace();
-            Toast aviso = Toast.makeText(getApplicationContext(), getResources().getString(R.string.grupo_existe), Toast.LENGTH_SHORT);
-            aviso.show();
-        }
+        workManager.getWorkInfoByIdLiveData(req.getId())
+                .observe(this, status -> {
+                    if (status != null && status.getState().isFinished()) {
+                        Boolean resultados = status.getOutputData().getBoolean("resultado", false);
+                        if(resultados) {
+                            arraydedatos.add(new Grupo(Name, currency, new ArrayList<Persona>(), new ArrayList<Gasto>(), new ArrayList<Pago>()));
+
+                            pAdapter.notifyDataSetChanged();
+
+                            actualizarVacioLleno(arraydedatos);
+                        }
+                        else {
+                            Toast aviso = Toast.makeText(getApplicationContext(), getResources().getString(R.string.grupo_existe), Toast.LENGTH_SHORT);
+                            aviso.show();
+                        }
+                    }});
 
     }
 

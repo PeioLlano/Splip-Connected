@@ -13,18 +13,19 @@
         exit();
     }
 
-    # Obtener nombre de la tabla
     $tabla = $_POST["tabla"];
+    $condicion = isset($_POST["condicion"]) ? $_POST["condicion"] : "";
 
-    # Obtener campos y valores
-    $fields = array_keys($_POST);
-    array_shift($fields);
-    $values = array_values($_POST);
-    array_shift($values);
-    $fields_str = implode(",", $fields);
-    $values_str = "'" . implode("','", $values) . "'";
+    
+    $sql = "DELETE FROM " . $tabla;
 
-    $sql = "INSERT INTO " . $tabla . " (" . $fields_str . ") VALUES (" . $values_str . ");";
+    if (!empty($condicion)) {
+        $sql .= " WHERE " . $condicion;
+    }
+
+    $sql .= ";";
+
+    //echo $sql . "<br>";
 
     try {
         $resultado = mysqli_query($con, $sql);
@@ -34,17 +35,9 @@
     if (!$resultado) {
         echo 'Ha ocurrido algún error: ' . mysqli_error($con);
     }
-
-    # Ejecutar consulta
-    if ($resultado) {
-        $last_id = $conn->insert_id;
-        $response = array('status' => 'success', 'message' => 'Registro insertado con éxito', 'id' => $last_id);
-    } else {
-        $response = array('status' => 'error', 'message' => 'Error al insertar registro: ' . $conn->error);
-    }        
-    
-    # Devolver los registros en formato JSON
-    echo json_encode($response);
-
+    else{
+        echo 'Ok';
+    }   
+ 
     $con->close();
 ?>
