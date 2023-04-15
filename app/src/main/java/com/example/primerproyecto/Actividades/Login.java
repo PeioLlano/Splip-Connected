@@ -9,8 +9,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,7 +33,7 @@ import com.example.primerproyecto.AlarmaNoti.AlarmaNotiReceiver;
 import com.example.primerproyecto.Dialogs.EstiloDialog;
 import com.example.primerproyecto.Dialogs.IdiomaDialog;
 import com.example.primerproyecto.R;
-import com.example.primerproyecto.Workers.TokenWorker;
+import com.example.primerproyecto.Workers.InsertWorker;
 import com.example.primerproyecto.Workers.SelectWorker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -220,23 +220,32 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
                         String token = task.getResult().getToken();
 
                         try {
-                            Data tokenData = new Data.Builder()
-                                    .putString("usuario", username)
-                                    .putString("token", token)
+                            Data data = new Data.Builder()
+                                    .putString("tabla", "Token")
+                                    .putStringArray("keys", new String[]{"Usuario", "Token"})
+                                    .putStringArray("values", new String[]{username, token})
                                     .build();
 
                             Constraints constr = new Constraints.Builder()
                                     .setRequiredNetworkType(NetworkType.CONNECTED)
                                     .build();
 
-                            OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(TokenWorker.class)
+                            OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(InsertWorker.class)
                                     .setConstraints(constr)
-                                    .setInputData(tokenData)
+                                    .setInputData(data)
                                     .build();
 
-                            WorkManager.getInstance(Login.this).getWorkInfoByIdLiveData(req.getId());
+                            WorkManager workManager = WorkManager.getInstance(Login.this);
+                            workManager.enqueue(req);
 
-                            WorkManager.getInstance(Login.this).enqueue(req);
+                            workManager.getWorkInfoByIdLiveData(req.getId())
+                                    .observe(Login.this, status -> {
+                                        if (status != null && status.getState().isFinished()) {
+                                            Boolean resultados = status.getOutputData().getBoolean("resultado", false);
+                                            if(resultados) {
+                                                Log.d("Token", "Token añadido correctamente");
+                                            }
+                                        }});
 
                         } catch (Exception e) {
                             e.printStackTrace();
