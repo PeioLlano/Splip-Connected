@@ -44,34 +44,41 @@ public class MapaGastos extends FragmentActivity implements OnMapReadyCallback {
         elmapa = googleMap;
         elmapa.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        elmapa.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                elmapa.clear();
+
+        Float totalLon = 0.0f;
+        Float totalLat = 0.0f;
+        Integer cantPos = 0;
+
+        for (Gasto g: grupo.getGastos()) {
+            if(g.getLatitud() != null && g.getLongitud() != null) {
                 elmapa.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .title("El marcador"));
+                        .position(new LatLng(g.getLatitud(), g.getLongitud()))
+                        .title(g.getTitulo()));
 
+                totalLon += g.getLongitud();
+                totalLat += g.getLatitud();
+                cantPos += 1;
             }
-        });
+        }
 
-        elmapa.addMarker(new MarkerOptions().position(new LatLng(43.2634167, -2.9505733)).title("1"));
-        elmapa.addMarker(new MarkerOptions().position(new LatLng(40.2634167, -12.9505733)).title("2"));
-        elmapa.addMarker(new MarkerOptions().position(new LatLng(46.2634167, 5.9505733)).title("3"));
-        elmapa.addMarker(new MarkerOptions().position(new LatLng(33.2634167, 0.9505733)).title("4"));
+        if (cantPos != 0) {
+            CameraPosition Poscam = new CameraPosition.Builder()
+                    .target(new LatLng(totalLat/cantPos, totalLon/cantPos))
+                    .zoom(7f)
+                    .build();
+            CameraUpdate otravista = CameraUpdateFactory.newCameraPosition(Poscam);
+            elmapa.animateCamera(otravista);
+        }
+        else{
+            CameraPosition Poscam = new CameraPosition.Builder()
+                    .target(new LatLng(33.2634167, 0.9505733))
+                    .zoom(4.5f)
+                    .build();
+            CameraUpdate otravista = CameraUpdateFactory.newCameraPosition(Poscam);
+            elmapa.animateCamera(otravista);
+        }
 
 
-        CameraPosition Poscam = new CameraPosition.Builder()
-                .target(new LatLng(33.2634167, 0.9505733))
-                .zoom(4.5f)
-                .build();
-        CameraUpdate otravista = CameraUpdateFactory.newCameraPosition(Poscam);
-        elmapa.animateCamera(otravista);
 
-        //for (Gasto g: grupo.getGastos()) {
-        //    elmapa.addMarker(new MarkerOptions()
-        //            .position(new LatLng(g.getLatitude(), g.getLongitude()))
-        //            .title(g.getTitulo()));
-        //}
     }
 }

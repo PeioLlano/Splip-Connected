@@ -14,7 +14,7 @@
     }
 
     # Ejecutar la sentencia SQL
-    $resultado = mysqli_query($con, "SELECT Token FROM Personas WHERE Token <> '' AND Token IS NOT NULL");
+    $resultado = mysqli_query($con, "SELECT Token FROM Token WHERE Token <> '' AND Token IS NOT NULL");
 
     # Comprobar si se ha ejecutado correctamente
     if (!$resultado) {
@@ -46,6 +46,9 @@
     );
 
     $msgJSON= json_encode ($msg);
+
+    echo $msgJSON;
+    echo json_encode($cabecera);
 
     $ch = curl_init(); #inicializar el handler de curl
     #indicar el destino de la petición, el servicio FCM de google

@@ -5,13 +5,11 @@ import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -57,9 +55,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Blob;
-import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -131,6 +126,9 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                                     String Persona = obj.getString("Persona");
                                     String Titulo = obj.getString("Titulo");
                                     Float Cantidad = (float) obj.getDouble("Cantidad");
+                                    String latitud = obj.getString("Latitud");
+                                    String longitud = obj.getString("Longitud");
+
 
                                     Date Fecha;
                                     try {
@@ -140,7 +138,17 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                                     }
 
                                     if (!grupo.gastoMetido(Codigo)) {
-                                        grupo.addGasto(new Gasto(Codigo, Titulo, Cantidad, getPersonaByName(Persona), Fecha), getPersonaByName(Persona));
+                                        Float latitudF;
+                                        Float longitudF;
+                                        if (latitud.equals("null") || longitud.equals("nulll")) {
+                                            latitudF = null;
+                                            longitudF = null;
+                                        }
+                                        else{
+                                            latitudF = Float.parseFloat(latitud);
+                                            longitudF = Float.parseFloat(longitud);
+                                        }
+                                        grupo.addGasto(new Gasto(Codigo, Titulo, Cantidad, getPersonaByName(Persona), Fecha, latitudF, longitudF), getPersonaByName(Persona));
                                     }
 
                                     pAdapter.notifyDataSetChanged();
@@ -401,14 +409,16 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                             String nombre = result.getData().getStringExtra("nombre");
                             String cantidad = result.getData().getStringExtra("cantidad");
                             String autor = result.getData().getStringExtra("autor");
+                            Float latitud = result.getData().getFloatExtra("latitud", 0f);
+                            Float longitud = result.getData().getFloatExtra("longitud", 0f);
 
                             Date date = new Date();
                             SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
                             Data data = new Data.Builder()
                                     .putString("tabla", "Gastos")
-                                    .putStringArray("keys", new String[]{"Grupo","Persona", "Titulo", "Cantidad", "Usuario", "Fecha"})
-                                    .putStringArray("values", new String[]{grupo.getTitulo(),autor, nombre, cantidad, username,  f.format(date)})
+                                    .putStringArray("keys", new String[]{"Grupo","Persona", "Titulo", "Cantidad", "Usuario", "Fecha", "Latitud", "Longitud"})
+                                    .putStringArray("values", new String[]{grupo.getTitulo(),autor, nombre, cantidad, username,  f.format(date), String.valueOf(latitud), String.valueOf(longitud)})
                                     .build();
 
                             Constraints constr = new Constraints.Builder()
@@ -428,7 +438,7 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                                         if (status != null && status.getState().isFinished()) {
                                             Boolean resultados = status.getOutputData().getBoolean("resultado", false);
                                             if(resultados) {
-                                                addGasto(new Gasto(status.getOutputData().getInt("id", -1), nombre, Float.parseFloat(cantidad), getPersonaByName(autor), date), getPersonaByName(autor));
+                                                addGasto(new Gasto(status.getOutputData().getInt("id", -1), nombre, Float.parseFloat(cantidad), getPersonaByName(autor), date, latitud, longitud), getPersonaByName(autor));
                                                 pAdapter.notifyDataSetChanged();
                                             }
                                             else {

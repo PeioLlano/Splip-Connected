@@ -10,13 +10,17 @@ public class Gasto implements Serializable {
     private Float cantidad;
     private Persona autor;
     private Date fecha;
+    private Float latitud;
+    private Float longitud;
 
-    public Gasto(Integer codigo, String titulo, Float cantidad, Persona autor, Date fecha) {
+    public Gasto(Integer codigo, String titulo, Float cantidad, Persona autor, Date fecha, Float latitud, Float longitud) {
         this.codigo = codigo;
         this.titulo = titulo;
         this.cantidad = cantidad;
         this.autor = autor;
         this.fecha = fecha;
+        this.latitud = latitud;
+        this.longitud = longitud;
     }
 
     public Integer getCodigo() {
@@ -37,5 +41,13 @@ public class Gasto implements Serializable {
 
     public Date getFecha() {
         return fecha;
+    }
+
+    public Float getLatitud() {
+        return latitud;
+    }
+
+    public Float getLongitud() {
+        return longitud;
     }
 }
