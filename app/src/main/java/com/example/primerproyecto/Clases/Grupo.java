@@ -99,7 +99,7 @@ public class Grupo implements Serializable {
         boolean ajustado = true;
 
         for (Persona p: personas) {
-            personasAjustadas.add(new Persona(p.getNombre(),p.getBalance(),0,0));
+            personasAjustadas.add(new Persona(p.getNombre(),p.getBalance(),0,0, null));
         }
 
         for (Persona p: personasAjustadas) {
@@ -160,7 +160,7 @@ public class Grupo implements Serializable {
     }
 
     public Persona getPersonaByName(String name){
-        Persona p = new Persona("",0f,0,0);
+        Persona p = new Persona("",0f,0,0, null);
 
         for (Persona pl: personas) {
             if (pl.getNombre().equals(name)) {

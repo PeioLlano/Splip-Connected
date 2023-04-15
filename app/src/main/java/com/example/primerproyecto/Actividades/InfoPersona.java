@@ -3,8 +3,10 @@ package com.example.primerproyecto.Actividades;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,6 +25,8 @@ import com.example.primerproyecto.Clases.Grupo;
 import com.example.primerproyecto.Clases.Persona;
 import com.example.primerproyecto.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.io.ByteArrayOutputStream;
 
 public class InfoPersona extends AppCompatActivity {
 
@@ -70,6 +74,18 @@ public class InfoPersona extends AppCompatActivity {
                     else intent.putExtra("nuevoNombre", "no cambio");
                     intent.putExtra("persona", persona);
 
+                    fotoPerfil.setDrawingCacheEnabled(true);
+                    fotoPerfil.buildDrawingCache();
+                    Bitmap bitmap = fotoPerfil.getDrawingCache();
+
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                    byte[] byteArray = byteArrayOutputStream.toByteArray();
+                    String fotoStr = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+                    intent.putExtra("foto", fotoStr);
+
+
                     setResult(RESULT_OK, intent);
                     finish();
                 }
@@ -100,6 +116,14 @@ public class InfoPersona extends AppCompatActivity {
                 permisosCamara();
             }
         });
+
+        String fotoStr = persona.getFoto();
+        if (!(fotoStr == null || fotoStr.equals("null"))){
+            byte[] decodedByteArray = Base64.decode(fotoStr, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
+            fotoPerfil.setImageBitmap(bitmap);
+        }
+
     }
 
     private void permisosCamara() {
@@ -119,7 +143,7 @@ public class InfoPersona extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_PERM_CODE) {
-            if (grantResults.length < 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(InfoPersona.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 openCamera();
             }
             else {

@@ -57,6 +57,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -232,12 +234,14 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                             String nuevoNombre = result.getData().getStringExtra("nuevoNombre");
                             if (!nuevoNombre.equals("no cambio")) {
                                 Persona personaCambio = (Persona) result.getData().getSerializableExtra("persona");
+                                String fotoStr = result.getData().getStringExtra("foto");
+                                Log.d("foto", fotoStr);
 
                                 Data data = new Data.Builder()
                                         .putString("tabla", "Personas")
                                         .putString("condicion", "Grupo = '"+grupo.getTitulo()+"' AND Nombre = '"+personaCambio.getNombre()+"' AND Usuario = '"+username+"'")
-                                        .putStringArray("keys", new String[]{"Nombre"})
-                                        .putStringArray("values", new String[]{nuevoNombre})
+                                        .putStringArray("keys", new String[]{"Nombre", "Foto"})
+                                        .putStringArray("values", new String[]{nuevoNombre, fotoStr})
                                         .build();
 
                                 Constraints constr = new Constraints.Builder()
@@ -980,7 +984,7 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                                     if (status != null && status.getState().isFinished()) {
                                         Boolean resultados = status.getOutputData().getBoolean("resultado", false);
                                         if(resultados) {
-                                            grupo.getPersonas().add(new Persona(nombre, (float) 0, 0, 0));
+                                            grupo.getPersonas().add(new Persona(nombre, (float) 0, 0, 0, null));
                                             posiblesPersonasNombre.add(username);
                                             grupo.actualizarBalances();
                                             pAdapter.notifyDataSetChanged();
@@ -1026,7 +1030,7 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                         if (status != null && status.getState().isFinished()) {
                             Boolean resultados = status.getOutputData().getBoolean("resultado", false);
                             if(resultados) {
-                                grupo.getPersonas().add(new Persona(Username, (float) 0, 0, 0));
+                                grupo.getPersonas().add(new Persona(Username, (float) 0, 0, 0, null));
                                 posiblesPersonasNombre.add(Username);
                                 grupo.actualizarBalances();
                                 pAdapter.notifyDataSetChanged();

@@ -1,7 +1,5 @@
 package com.example.primerproyecto.Clases;
 
-import android.database.sqlite.SQLiteDatabase;
-
 import java.io.Serializable;
 
 public class Persona implements Serializable {
@@ -10,12 +8,14 @@ public class Persona implements Serializable {
     private Float balance;
     private Integer gastos;
     private Integer pagos;
+    private String foto;
 
-    public Persona(String nombre, Float balance, Integer gastos, Integer pagos) {
+    public Persona(String nombre, Float balance, Integer gastos, Integer pagos, String foto) {
         this.nombre = nombre;
         this.balance = balance;
         this.gastos = gastos;
         this.pagos = pagos;
+        this.foto = foto;
     }
 
     public String getNombre() {
@@ -32,6 +32,10 @@ public class Persona implements Serializable {
 
     public Integer getPagos() {
         return pagos;
+    }
+
+    public String getFoto() {
+        return foto;
     }
 
     public void setBalance(Float balance) {

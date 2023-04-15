@@ -121,8 +121,9 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
                                         JSONObject obj2 = jsonArray2[0].getJSONObject(j);
 
                                         String Nombre = obj2.getString("Nombre");
+                                        String foto = obj2.getString("Foto");
 
-                                        if (!gru.tieneNombre(Nombre)) gru.getPersonas().add(new Persona(Nombre, 0f, 0, 0));
+                                        if (!gru.tieneNombre(Nombre)) gru.getPersonas().add(new Persona(Nombre, 0f, 0, 0, foto));
                                     }
 
                                 } catch (JSONException e) {
@@ -218,8 +219,9 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
                                                                     JSONObject obj2 = jsonArray2[0].getJSONObject(j);
 
                                                                     String Nombre = obj2.getString("Nombre");
+                                                                    String foto = obj2.getString("Foto");
 
-                                                                    personasGrupo.add(new Persona(Nombre, 0f, 0, 0));
+                                                                    personasGrupo.add(new Persona(Nombre, 0f, 0, 0, foto));
                                                                 }
 
                                                                 arraydedatos.add(new Grupo(Titulo, Divisa, personasGrupo, new ArrayList<Gasto>(), new ArrayList<Pago>()));
