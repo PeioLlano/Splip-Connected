@@ -11,15 +11,15 @@
         android:id="@+id/bImport"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:clickable="true"
         android:visibility="visible"
         app:backgroundTint="@android:color/holo_orange_dark"
         app:fabCustomSize="40dp"
         app:fabSize="mini"
-        app:layout_constraintBottom_toBottomOf="@+id/tGrupo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tGrupo"
+        app:layout_constraintBottom_toBottomOf="@+id/bAjustarCuentas"
+        app:layout_constraintStart_toEndOf="@+id/bAjustarCuentas"
+        app:layout_constraintTop_toTopOf="@+id/bAjustarCuentas"
         app:maxImageSize="22dp"
         app:srcCompat="@drawable/download"
         tools:ignore="SpeakableTextPresentCheck" />
@@ -239,6 +239,19 @@
         app:layout_constraintBottom_toTopOf="@+id/bVerGastos"
         app:layout_constraintStart_toStartOf="@+id/bVerGastos"
         app:srcCompat="@drawable/flecha_derecha"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/bVerGastosLocalizados"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:clickable="false"
+        android:visibility="invisible"
+        app:backgroundTint="@android:color/holo_orange_dark"
+        app:layout_constraintBottom_toTopOf="@+id/bVerPagos"
+        app:layout_constraintStart_toStartOf="@+id/bVerPagos"
+        app:srcCompat="@drawable/location"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <TextView

@@ -64,15 +64,15 @@ public class MapaGastos extends FragmentActivity implements OnMapReadyCallback {
         if (cantPos != 0) {
             CameraPosition Poscam = new CameraPosition.Builder()
                     .target(new LatLng(totalLat/cantPos, totalLon/cantPos))
-                    .zoom(7f)
+                    .zoom(8f)
                     .build();
             CameraUpdate otravista = CameraUpdateFactory.newCameraPosition(Poscam);
             elmapa.animateCamera(otravista);
         }
         else{
             CameraPosition Poscam = new CameraPosition.Builder()
-                    .target(new LatLng(33.2634167, 0.9505733))
-                    .zoom(4.5f)
+                    .target(new LatLng(43.9785280, 15.3833720))
+                    .zoom(15.5f)
                     .build();
             CameraUpdate otravista = CameraUpdateFactory.newCameraPosition(Poscam);
             elmapa.animateCamera(otravista);

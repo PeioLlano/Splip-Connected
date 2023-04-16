@@ -110,7 +110,8 @@ public class ListGrupos extends AppCompatActivity implements IdiomaDialog.Listen
                     .observe(this, status2 -> {
                         if (status2 != null && status2.getState().isFinished()) {
                             String resultados2 = status2.getOutputData().getString("resultados");
-                            if (resultados2 == "null" || resultados2 == "") resultados2 = null;
+                            if ((resultados2.equals("null")) || (resultados2.equals("")))
+                                resultados2 = null;
                             if(resultados2 != null) {
                                 try {
                                     jsonArray2[0] = new JSONArray(resultados2);

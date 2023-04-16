@@ -78,8 +78,8 @@ public class AddGasto extends AppCompatActivity {
                     intent.putExtra("nombre", eNombre.getText().toString());
                     intent.putExtra("cantidad", eCantidad.getText().toString());
                     intent.putExtra("autor", sAutor.getSelectedItem().toString());
-                    intent.putExtra("latitud", String.valueOf(latitud));
-                    intent.putExtra("longitud", String.valueOf(longitud));
+                    intent.putExtra("latitud", latitud);
+                    intent.putExtra("longitud", longitud);
 
                     setResult(RESULT_OK, intent);
                     finish();
