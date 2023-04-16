@@ -9,7 +9,9 @@ import com.example.primerproyecto.Actividades.Login;
 public class AlarmaNotiReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Intent serviceIntent = new Intent(context, Login.class);
-        context.startService(serviceIntent);
+        Intent serviceIntent = new Intent(context, AlarmNotiService.class);
+        context.startForegroundService(serviceIntent);
     }
+
+
 }

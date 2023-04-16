@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -58,14 +59,14 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
-        scheduleAlarm();
-
         //Pedimos los permisos para notificaciones si es que no los tenemos
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)!=
                 PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new
                     String[]{Manifest.permission.POST_NOTIFICATIONS}, 11);
         }
+
+        scheduleAlarm();
 
         EditText eUsername = findViewById(R.id.eUsername);
         EditText ePassword = findViewById(R.id.ePassword);
@@ -258,9 +259,20 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmaNotiReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        long intervalMillis = 60 * 1000; // 1 minute
+
+        // Cancelar la alarma si ya estaba establecida
+        alarmManager.cancel(pendingIntent);
+
+        long intervalMillis = 30 * 60 * 1000; // 30 minute
         long triggerAtMillis = System.currentTimeMillis() + intervalMillis;
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis, pendingIntent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+        }
     }
 
 
