@@ -19,8 +19,6 @@ public class ServicioFirebase extends FirebaseMessagingService {
 
     public void onMessageReceived(RemoteMessage remoteMessage) {
         if (remoteMessage.getData().size() > 0) {
-        }
-        if (remoteMessage.getNotification() != null) {
             NotificationManager elManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationCompat.Builder elBuilder = new NotificationCompat.Builder(getApplicationContext(), "IdCanal");
             elBuilder.setSmallIcon(R.drawable.noti)
@@ -36,6 +34,9 @@ public class ServicioFirebase extends FirebaseMessagingService {
                 elManager.createNotificationChannel(elCanal);
             }
             elManager.notify(1, elBuilder.build());
+        }
+        if (remoteMessage.getNotification() != null) {
+
         }
     }
 }

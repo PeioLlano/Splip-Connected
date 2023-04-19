@@ -42,6 +42,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
 public class Login extends AppCompatActivity implements IdiomaDialog.ListenerdelDialogoIdioma, EstiloDialog.ListenerdelDialogoEstilo{
@@ -168,9 +170,11 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
 
         if (!(username.isEmpty() || password.isEmpty())) {
 
+            String passHash = hashPassword(password);
+
             Data data = new Data.Builder()
                     .putString("tabla", "Usuarios")
-                    .putString("condicion", "Usuario='"+username+"' AND Contraseña='" + password+"'")
+                    .putString("condicion", "Usuario='"+username+"' AND Contraseña='" + passHash+"'")
                     .build();
 
             Constraints constr = new Constraints.Builder()
@@ -207,6 +211,22 @@ public class Login extends AppCompatActivity implements IdiomaDialog.Listenerdel
         else {
             avisoInicioIncorrecto.show();
         }
+    }
+
+    public static String hashPassword(String password) {
+        String generatedPassword = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] bytes = md.digest(password.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < bytes.length; i++) {
+                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            generatedPassword = sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return generatedPassword;
     }
 
     private void subirTokenFirebase(String username) {

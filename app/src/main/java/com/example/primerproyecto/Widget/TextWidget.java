@@ -60,7 +60,7 @@ public class TextWidget extends AppWidgetProvider {
                 e.printStackTrace();
             }
         }
-        // There may be multiple widgets active, so update all of them
+
         handler.postDelayed(updateWidgetRunnable(context, appWidgetManager, appWidgetIds), UPDATE_INTERVAL);
     }
 

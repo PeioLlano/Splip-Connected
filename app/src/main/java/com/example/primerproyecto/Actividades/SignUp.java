@@ -29,6 +29,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,10 +95,12 @@ public class SignUp extends AppCompatActivity{
         int tiempoToast= Toast.LENGTH_SHORT;
         Toast avisoInicioIncorrecto = Toast.makeText(this, getString(R.string.user_exist), tiempoToast);
 
+        String passHash = hashPassword(pass);
+
         Data data = new Data.Builder()
-                .putString("Tabla", "Usuario")
-                .putString("Usuario", username)
-                .putString("Contraseña", pass)
+                .putString("tabla", "Usuarios")
+                .putStringArray("keys", new String[]{"Usuario", "Contraseña"})
+                .putStringArray("values", new String[]{username, passHash})
                 .build();
 
         Constraints constr = new Constraints.Builder()
@@ -111,8 +115,8 @@ public class SignUp extends AppCompatActivity{
         WorkManager.getInstance(this).getWorkInfoByIdLiveData(req.getId())
                 .observe(this, status -> {
                     if (status != null && status.getState().isFinished()) {
-                        String id_user = status.getOutputData().getString("datos");
-                        if(!id_user.isEmpty()) {
+                        Boolean inserted = status.getOutputData().getBoolean("resultado", false);
+                        if(inserted) {
 
                             guardarPreferenciaLogin(username);
 
@@ -133,6 +137,22 @@ public class SignUp extends AppCompatActivity{
                     }
                 });
         WorkManager.getInstance(this).enqueue(req);
+    }
+
+    public static String hashPassword(String password) {
+        String generatedPassword = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] bytes = md.digest(password.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < bytes.length; i++) {
+                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            generatedPassword = sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return generatedPassword;
     }
 
     private void subirTokenFirebase(String username) {
