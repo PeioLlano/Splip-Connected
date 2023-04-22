@@ -31,8 +31,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -111,16 +109,17 @@ public class AddGasto extends AppCompatActivity {
         locationRequest.setInterval(5000);
         locationRequest.setFastestInterval(2000);
 
-        getCurrentLocation();
+        getUbicacionActual();
 
     }
 
-    //Comprobar si todos los campos son rellenos.
     private boolean todo_relleno(String nombre, String cantidad, String persona) {
+        // Verificar si todos los campos del formulario están llenos
         return ((!nombre.equals("")) && (!cantidad.equals("")) && (!persona.equals("")));
     }
 
     private void solicitarPermisosUbicacion() {
+        // Verificar si se requieren permisos para obtener la ubicación actual
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this, android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -128,6 +127,7 @@ public class AddGasto extends AppCompatActivity {
                     ContextCompat.checkSelfPermission(
                             this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
                             != PackageManager.PERMISSION_GRANTED) {
+                // Solicitar permisos si no se han concedido
                 ActivityCompat.requestPermissions(this, new
                         String[]{
                         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -137,19 +137,21 @@ public class AddGasto extends AppCompatActivity {
         }
     }
 
-    private boolean isGPSEnabled() {
+    private boolean gpsActivo() {
         LocationManager locationManager = null;
-        boolean isEnabled = false;
+        boolean activo = false;
 
         if (locationManager == null) {
+            // Obtener el servicio de ubicación del sistema si aún no se ha hecho
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         }
 
-        isEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        return isEnabled;
+        // Verificar si el GPS está activado en el dispositivo
+        activo = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        return activo;
     }
 
-    private void turnOnGPS() {
+    private void encenderGPS() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
         builder.setAlwaysShow(true);
@@ -163,13 +165,14 @@ public class AddGasto extends AppCompatActivity {
 
                 try {
                     LocationSettingsResponse response = task.getResult(ApiException.class);
-                    Toast.makeText(AddGasto.this, "GPS is already tured on", Toast.LENGTH_SHORT).show();
+                    // Mostrar un mensaje si el GPS ya está encendido
+                    Toast.makeText(AddGasto.this, "GPS is already turned on", Toast.LENGTH_SHORT).show();
 
                 } catch (ApiException e) {
 
                     switch (e.getStatusCode()) {
                         case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-
+                            // Si es necesario, solicitar al usuario que active el GPS
                             try {
                                 ResolvableApiException resolvableApiException = (ResolvableApiException) e;
                                 resolvableApiException.startResolutionForResult(AddGasto.this, 2);
@@ -179,7 +182,7 @@ public class AddGasto extends AppCompatActivity {
                             break;
 
                         case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            //Device does not have location
+                            // El dispositivo no tiene capacidad de ubicación
                             break;
                     }
                 }
@@ -187,38 +190,52 @@ public class AddGasto extends AppCompatActivity {
         });
     }
 
-    private void getCurrentLocation() {
+    private void getUbicacionActual() {
 
+        // Verificar que el SDK mínimo es M o superior (Marshmallow o superior)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            // Verificar que la aplicación tenga permiso de ACCESS_FINE_LOCATION
             if (ActivityCompat.checkSelfPermission(AddGasto.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                if (isGPSEnabled()) {
+
+                // Verificar que el GPS esté habilitado
+                if (gpsActivo()) {
+
+                    // Solicitar actualizaciones de ubicación al proveedor de ubicación fusionado de Google Play Services
                     LocationServices.getFusedLocationProviderClient(AddGasto.this)
                             .requestLocationUpdates(locationRequest, new LocationCallback() {
                                 @Override
                                 public void onLocationResult(@NonNull LocationResult locationResult) {
                                     super.onLocationResult(locationResult);
 
+                                    // Detener las actualizaciones de ubicación
                                     LocationServices.getFusedLocationProviderClient(AddGasto.this)
                                             .removeLocationUpdates(this);
 
+                                    // Obtener la última ubicación
                                     if (locationResult != null && locationResult.getLocations().size() >0){
 
                                         int index = locationResult.getLocations().size() - 1;
                                         double latitude = locationResult.getLocations().get(index).getLatitude();
                                         double longitude = locationResult.getLocations().get(index).getLongitude();
+
+                                        // Convertir la latitud y longitud en flotantes y asignarlas a las variables globales latitud y longitud
                                         latitud = (float) latitude;
                                         longitud = (float) longitude;
 
+                                        // Mostrar la ubicación en la consola de depuración
                                         Log.d("ubicacion", "Ubicacion: " + latitud + ", " + longitud);
                                     }
                                 }
                             }, Looper.getMainLooper());
 
                 } else {
-                    turnOnGPS();
+                    // Si el GPS no está habilitado, mostrar un diálogo para que el usuario lo habilite
+                    encenderGPS();
                 }
 
             } else {
+                // Si la aplicación no tiene permiso de ACCESS_FINE_LOCATION, solicitar el permiso
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             }
         }
