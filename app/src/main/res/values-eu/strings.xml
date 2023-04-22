@@ -73,4 +73,6 @@
     <string name="delete_payment">Ordainketa ezabatu nahi duzu?</string>
     <string name="Titulo">Izenburua</string>
     <string name="NotiFirebase">" Gogoratu zure gastuak egunean eramateaz"</string>
+    <string name="map_expenses">Mapeatu gastuak</string>
+    <string name="exp_map_expenses">"Markadore bat gastu bakoitzeko "</string>
 </resources>

@@ -73,4 +73,6 @@
     <string name="delete_payment">Do you want to delete the payment?</string>
     <string name="Titulo">Tittle</string>
     <string name="NotiFirebase">Remember to keep up with your expenses</string>
+    <string name="map_expenses">Map expenses</string>
+    <string name="exp_map_expenses">Marker for each expense</string>
 </resources>

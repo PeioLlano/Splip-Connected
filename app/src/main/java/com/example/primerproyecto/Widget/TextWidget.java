@@ -27,26 +27,36 @@ public class TextWidget extends AppWidgetProvider {
     private static final int UPDATE_INTERVAL = 5000; // 5 segundos en milisegundos
     private Handler handler = new Handler();
 
+
+    // Método que actualiza el widget
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
+        // Crear las vistas del widget
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.text_widget);
 
+        // Seleccionar una frase aleatoria de la lista de frases
         int numeroAleatorio = 0 + new Random().nextInt(frases.size() - 1);
 
+        // Establecer la frase seleccionada en la vista del widget
         views.setTextViewText(R.id.appwidget_text, frases.get(numeroAleatorio));
 
+        // Crear un intent para lanzar la actividad Login cuando se haga clic en el widget
         Intent intent = new Intent(context, Login.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        // Establecer el intent como acción al hacer clic en la vista del widget
         views.setOnClickPendingIntent(R.id.appwidget_text, pendingIntent);
 
+        // Actualizar la vista del widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        // Si la lista de frases está vacía, cargar las frases desde un archivo de recursos
         if (frases.size() == 0){
-            InputStream fich = context.getResources().openRawResource(R.raw.fortune);
+            InputStream fich = context.getResources().openRawResource(R.raw.frases_gastos);
             BufferedReader reader = new BufferedReader(new InputStreamReader(fich));
             try {
                 String line = reader.readLine();
@@ -80,7 +90,7 @@ public class TextWidget extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         // Enter relevant functionality for when the first widget is created
-        InputStream fich = context.getResources().openRawResource(R.raw.fortune);
+        InputStream fich = context.getResources().openRawResource(R.raw.frases_gastos);
         BufferedReader reader = new BufferedReader(new InputStreamReader(fich));
         try {
             String line = reader.readLine();

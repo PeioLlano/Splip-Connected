@@ -73,4 +73,6 @@
     <string name="delete_payment">¿Quiere eliminar el pago?</string>
     <string name="Titulo">Titulo</string>
     <string name="NotiFirebase">Acuerdese de mantenerse a día con sus gastos</string>
+    <string name="map_expenses">Mapear gastos</string>
+    <string name="exp_map_expenses">Marcador por cada gasto</string>
 </resources>

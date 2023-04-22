@@ -240,46 +240,45 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == RESULT_OK) {
                             String nuevoNombre = result.getData().getStringExtra("nuevoNombre");
-                            if (!nuevoNombre.equals("no cambio")) {
-                                Persona personaCambio = (Persona) result.getData().getSerializableExtra("persona");
-                                String fotoStr = result.getData().getStringExtra("foto");
-                                Log.d("foto", fotoStr);
+                            Persona personaCambio = (Persona) result.getData().getSerializableExtra("persona");
+                            String fotoStr = result.getData().getStringExtra("foto");
 
-                                Data data = new Data.Builder()
-                                        .putString("tabla", "Personas")
-                                        .putString("condicion", "Grupo = '"+grupo.getTitulo()+"' AND Nombre = '"+personaCambio.getNombre()+"' AND Usuario = '"+username+"'")
-                                        .putStringArray("keys", new String[]{"Nombre", "Foto"})
-                                        .putStringArray("values", new String[]{nuevoNombre, fotoStr})
-                                        .build();
+                            Log.d("foto", fotoStr);
 
-                                Constraints constr = new Constraints.Builder()
-                                        .setRequiredNetworkType(NetworkType.CONNECTED)
-                                        .build();
+                            Data data = new Data.Builder()
+                                    .putString("tabla", "Personas")
+                                    .putString("condicion", "Grupo = '"+grupo.getTitulo()+"' AND Nombre = '"+personaCambio.getNombre()+"' AND Usuario = '"+username+"'")
+                                    .putStringArray("keys", new String[]{"Nombre", "Foto"})
+                                    .putStringArray("values", new String[]{nuevoNombre, fotoStr})
+                                    .build();
 
-                                OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(UpdateWorker.class)
-                                        .setConstraints(constr)
-                                        .setInputData(data)
-                                        .build();
+                            Constraints constr = new Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                                    .build();
 
-                                WorkManager workManager = WorkManager.getInstance(MainGrupo.this);
-                                workManager.enqueue(req);
+                            OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(UpdateWorker.class)
+                                    .setConstraints(constr)
+                                    .setInputData(data)
+                                    .build();
 
-                                workManager.getWorkInfoByIdLiveData(req.getId())
-                                        .observe(MainGrupo.this, status -> {
-                                            if (status != null && status.getState().isFinished()) {
-                                                Boolean resultados = status.getOutputData().getBoolean("resultado", false);
-                                                if(resultados) {
-                                                    grupo.getPersonaByName(personaCambio.getNombre()).setNombre(nuevoNombre);
-                                                    pAdapter.notifyDataSetChanged();
-                                                }
-                                                else {
-                                                    Toast aviso = Toast.makeText(getApplicationContext(), getResources().getString(R.string.grupo_existe), Toast.LENGTH_SHORT);
-                                                    aviso.show();
-                                                }
-                                            }});
+                            WorkManager workManager = WorkManager.getInstance(MainGrupo.this);
+                            workManager.enqueue(req);
+
+                            workManager.getWorkInfoByIdLiveData(req.getId())
+                                    .observe(MainGrupo.this, status -> {
+                                        if (status != null && status.getState().isFinished()) {
+                                            Boolean resultados = status.getOutputData().getBoolean("resultado", false);
+                                            if(resultados) {
+                                                grupo.getPersonaByName(personaCambio.getNombre()).setNombre(nuevoNombre);
+                                                pAdapter.notifyDataSetChanged();
+                                            }
+                                            else {
+                                                Toast aviso = Toast.makeText(getApplicationContext(), getResources().getString(R.string.grupo_existe), Toast.LENGTH_SHORT);
+                                                aviso.show();
+                                            }
+                                        }});
 
 
-                            }
                         }
                     }
                 }
@@ -691,6 +690,9 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
             }
         });
 
+        TextView tMapGastos = (TextView) findViewById(R.id.tMapGastos);
+        TextView tExpMapGastos = (TextView) findViewById(R.id.tExpMapGastos);
+
         //--------------------------------------------------------------------------------------------------------------
         //                                           OPCIONES
         //--------------------------------------------------------------------------------------------------------------
@@ -743,6 +745,9 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
 
                     tListGastos.setVisibility(View.INVISIBLE);
                     tExpListGastos.setVisibility(View.INVISIBLE);
+
+                    tMapGastos.setVisibility(View.INVISIBLE);
+                    tExpMapGastos.setVisibility(View.INVISIBLE);
 
                     clicadoVer[0] = false;
                 }
@@ -801,6 +806,9 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
                     tListGastos.setVisibility(View.VISIBLE);
                     tExpListGastos.setVisibility(View.VISIBLE);
 
+                    tMapGastos.setVisibility(View.VISIBLE);
+                    tExpMapGastos.setVisibility(View.VISIBLE);
+
                     //Quitar los de la derecha
 
                     bOtions.setImageResource(R.drawable.left);
@@ -841,6 +849,9 @@ public class MainGrupo extends AppCompatActivity implements AddPersonDialog.AddP
 
                     tListGastos.setVisibility(View.INVISIBLE);
                     tExpListGastos.setVisibility(View.INVISIBLE);
+
+                    tMapGastos.setVisibility(View.INVISIBLE);
+                    tExpMapGastos.setVisibility(View.INVISIBLE);
                 }
                 clicadoVer[0] = !clicadoVer[0];
             }

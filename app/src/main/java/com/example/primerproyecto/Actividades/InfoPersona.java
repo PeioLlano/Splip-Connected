@@ -66,8 +66,6 @@ public class InfoPersona extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                //Si el nombre no está ya en el grupo mandamos los datos de la persona cambiada y el nuevo nombre a Main grupo para que lo gestione.
-                if (!grupo.tieneNombre(eNombre.getText().toString())){
                     Intent intent = new Intent();
 
                     if (!persona.getNombre().equals(eNombre.getText().toString())) intent.putExtra("nuevoNombre", eNombre.getText().toString());
@@ -81,21 +79,14 @@ public class InfoPersona extends AppCompatActivity {
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
                     byte[] byteArray = byteArrayOutputStream.toByteArray();
+                    System.out.println(byteArray.length);
                     String fotoStr = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
                     intent.putExtra("foto", fotoStr);
 
-
                     setResult(RESULT_OK, intent);
                     finish();
                 }
-                //En caso contrario mostramos un toast
-                else{
-                    int tiempoToast= Toast.LENGTH_SHORT;
-                    Toast avisoCambio = Toast.makeText(view.getContext(), getString(R.string.persona_existe), tiempoToast);
-                    avisoCambio.show();
-                }
-            }
         });
 
         //En caso de pulsar el boton para retroceder, pondremos el flag que indique que no se a completado correctamente lo que se deberia de haber hecho.

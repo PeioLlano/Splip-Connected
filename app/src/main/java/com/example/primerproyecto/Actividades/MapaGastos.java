@@ -23,56 +23,48 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapaGastos extends FragmentActivity implements OnMapReadyCallback {
 
-    private GoogleMap elmapa;
-    private Grupo grupo;
+    private GoogleMap elmapa; // variable para guardar la instancia del objeto GoogleMap
+    private Grupo grupo; // variable para guardar un objeto de tipo Grupo
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.mapa);
+        setContentView(R.layout.mapa); // se carga el layout de la actividad
 
         SupportMapFragment elfragmento =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentoMapa);
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentoMapa); // se busca el fragmento donde se colocará el mapa
 
-        elfragmento.getMapAsync(this);
+        elfragmento.getMapAsync(this); // se inicia la carga del mapa
 
-        grupo = (Grupo) getIntent().getSerializableExtra("grupo");
+        grupo = (Grupo) getIntent().getSerializableExtra("grupo"); // se recupera el objeto Grupo enviado desde la actividad anterior
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        elmapa = googleMap;
-        elmapa.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        elmapa = googleMap; // se asigna la instancia del objeto GoogleMap recibido como parámetro a la variable elmapa
+        elmapa.setMapType(GoogleMap.MAP_TYPE_NORMAL); // se define el tipo de mapa a mostrar
 
 
-        Float totalLon = 0.0f;
-        Float totalLat = 0.0f;
-        Integer cantPos = 0;
+        Float totalLon = 0.0f; // variable para guardar la suma de longitudes
+        Float totalLat = 0.0f; // variable para guardar la suma de latitudes
+        Integer cantPos = 0; // variable para guardar la cantidad de posiciones de los gastos del grupo
 
-        for (Gasto g: grupo.getGastos()) {
-            if(g.getLatitud() != null && g.getLongitud() != null) {
+        for (Gasto g: grupo.getGastos()) { // se recorre la lista de gastos del grupo
+            if(g.getLatitud() != null && g.getLongitud() != null) { // si el gasto tiene latitud y longitud
                 elmapa.addMarker(new MarkerOptions()
                         .position(new LatLng(g.getLatitud(), g.getLongitud()))
-                        .title(g.getTitulo()));
+                        .title(g.getTitulo())); // se agrega un marcador en el mapa en la posición del gasto
 
-                totalLon += g.getLongitud();
-                totalLat += g.getLatitud();
-                cantPos += 1;
+                totalLon += g.getLongitud(); // se suma la longitud del gasto actual
+                totalLat += g.getLatitud(); // se suma la latitud del gasto actual
+                cantPos += 1; // se aumenta el contador de posiciones
             }
         }
 
-        if (cantPos != 0) {
+        if (cantPos != 0) { // si hay al menos una posición de gasto registrada
             CameraPosition Poscam = new CameraPosition.Builder()
-                    .target(new LatLng(totalLat/cantPos, totalLon/cantPos))
-                    .zoom(8f)
-                    .build();
-            CameraUpdate otravista = CameraUpdateFactory.newCameraPosition(Poscam);
-            elmapa.animateCamera(otravista);
-        }
-        else{
-            CameraPosition Poscam = new CameraPosition.Builder()
-                    .target(new LatLng(43.9785280, 15.3833720))
-                    .zoom(15.5f)
+                    .target(new LatLng(totalLat/cantPos, totalLon/cantPos)) // se define la posición de la cámara del mapa en el centro de las posiciones de los gastos
+                    .zoom(8f) // se establece un zoom de 8
                     .build();
             CameraUpdate otravista = CameraUpdateFactory.newCameraPosition(Poscam);
             elmapa.animateCamera(otravista);
