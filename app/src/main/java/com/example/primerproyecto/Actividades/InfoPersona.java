@@ -69,7 +69,7 @@ public class InfoPersona extends AppCompatActivity {
                     Intent intent = new Intent();
 
                     if (!persona.getNombre().equals(eNombre.getText().toString())) intent.putExtra("nuevoNombre", eNombre.getText().toString());
-                    else intent.putExtra("nuevoNombre", "no cambio");
+                    else intent.putExtra("nuevoNombre", persona.getNombre());
                     intent.putExtra("persona", persona);
 
                     fotoPerfil.setDrawingCacheEnabled(true);
