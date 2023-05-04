@@ -61,16 +61,21 @@ public class MapaGastos extends FragmentActivity implements OnMapReadyCallback {
             }
         }
 
-        if (cantPos != 0) { // si hay al menos una posición de gasto registrada
+        if (cantPos != 0) {
             CameraPosition Poscam = new CameraPosition.Builder()
-                    .target(new LatLng(totalLat/cantPos, totalLon/cantPos)) // se define la posición de la cámara del mapa en el centro de las posiciones de los gastos
-                    .zoom(8f) // se establece un zoom de 8
+                    .target(new LatLng(totalLat/cantPos, totalLon/cantPos))
+                    .zoom(8f)
                     .build();
             CameraUpdate otravista = CameraUpdateFactory.newCameraPosition(Poscam);
             elmapa.animateCamera(otravista);
         }
-
-
-
+        else {
+            CameraPosition Poscam = new CameraPosition.Builder()
+                    .target(new LatLng(43.9785280, 15.3833720))
+                    .zoom(15.5f)
+                    .build();
+            CameraUpdate otravista = CameraUpdateFactory.newCameraPosition(Poscam);
+            elmapa.animateCamera(otravista);
+        }
     }
 }
